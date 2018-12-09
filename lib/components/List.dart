@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app1/api/HttpController.dart';
 
 class List extends StatefulWidget {
   @override
@@ -8,10 +9,14 @@ class List extends StatefulWidget {
 }
 
 class ListState extends State<List> {
+  getData() async {
+    var url = '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return new ListView.builder(
-      itemCount: 10,
+      itemCount: 20,
       itemBuilder: (BuildContext context, int index) {
         return new Card(
           child: new Container(
@@ -38,16 +43,19 @@ class ListState extends State<List> {
                               ),
                             ),
                             new Container(
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width - 100.0,
                               margin: EdgeInsets.only(top: 10),
                               child: new Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
                                   new Text('新闻描述',
                                       style: new TextStyle(fontSize: 14)),
-                                  new Container(
-                                    margin: EdgeInsets.only(left: 180),
-                                    child: new Text('2018-09-23',
-                                        style: new TextStyle(fontSize: 12)),
-                                  ),
+                                  new Text('2018-09-23',
+                                      style: new TextStyle(fontSize: 12)),
                                 ],
                               ),
                             )

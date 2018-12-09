@@ -27,10 +27,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   TabController controller;
+  int _tabIndex = 0;
+  var bodys = [new FirstPage(), new SecondPage(), new ThirdPage()];
+  var titles = [new Text('列表'), new Text('通知'), new Text('我的')];
 
   @override
   void initState() {
-    controller = new TabController(initialIndex: 0, length: 3, vsync: this);
+    controller = new TabController(length: 3, vsync: this);
     print(controller.length);
   }
 
@@ -40,27 +43,34 @@ class _MyHomePageState extends State<MyHomePage>
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     print('Build---');
     return new Scaffold(
-      body: new TabBarView(
-        children: <Widget>[
-          new FirstPage(),
-          new SecondPage(),
-          new ThirdPage(),
-        ],
-        controller: controller,
-      ),
-      bottomNavigationBar: new Material(
-          color: Colors.amberAccent,
-          child: new TabBar(tabs: <Tab>[
-            new Tab(text: '列表', icon: new Icon(Icons.home)),
-            new Tab(text: '通知', icon: new Icon(Icons.message)),
-            new Tab(text: '我的', icon: new Icon(Icons.cloud)),
+        appBar: new AppBar(
+          title: titles[_tabIndex],
+        ),
+        body: bodys[_tabIndex],
+        bottomNavigationBar: new BottomNavigationBar(
+          fixedColor: Colors.blue,
+          items: [
+            new BottomNavigationBarItem(
+                icon: new Icon(Icons.home), title: titles[0]),
+            new BottomNavigationBarItem(
+                icon: new Icon(Icons.message), title: titles[1]),
+            new BottomNavigationBarItem(
+                icon: new Icon(Icons.cloud), title: titles[2]),
           ],
-          controller: controller,)),
-    );
+          //设置显示的模式
+          type: BottomNavigationBarType.fixed,
+          //设置当前的索引
+          currentIndex: _tabIndex,
+          //tabBottom的点击监听
+          onTap: (index) {
+            setState(() {
+              _tabIndex = index;
+            });
+          },
+        ));
   }
 }
