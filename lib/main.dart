@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'views/FirstPage.dart';
-import 'views/SecondPage.dart';
+import 'views/HomePage.dart';
+import 'views/DiscoveryPage.dart';
 import 'views/ThirdPage.dart';
+import 'components/IconTap.dart';
 
 void main() => runApp(MyApp());
+const int INDEX_HOME = 0;
+const int INDEX_MESSAGE = 1;
+const int INDEX_MY = 2;
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -12,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: const Color(0xffffffff),
       ),
       home: MyHomePage(),
     );
@@ -25,52 +29,82 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin{
   TabController controller;
-  int _tabIndex = 0;
-  var bodys = [new FirstPage(), new SecondPage(), new ThirdPage()];
-  var titles = [new Text('列表'), new Text('通知'), new Text('我的')];
+  VoidCallback onChange;
+  int _currentIndex = 0;
+  var titles = <String>['列表', '发现', '通知'];
+  var bodys = [];
+
+  _MyHomePageState() {
+    var first = new HomePage();
+    var second = new DiscoveryPage();
+    var third = new ThirdPage();
+    bodys = [first, second, third];
+    controller = new TabController(length: 3, vsync: this);
+    onChange = () {
+      setState(() {
+        _currentIndex = controller.index;
+      });
+    };
+    controller.addListener(onChange);
+  }
 
   @override
   void initState() {
-    controller = new TabController(length: 3, vsync: this);
-    print(controller.length);
+    super.initState();
   }
 
   @override
   void dispose() {
+    controller.removeListener(onChange);
     controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('Build---');
     return new Scaffold(
-        appBar: new AppBar(
-          title: titles[_tabIndex],
-        ),
-        body: bodys[_tabIndex],
-        bottomNavigationBar: new BottomNavigationBar(
-          fixedColor: Colors.blue,
-          items: [
-            new BottomNavigationBarItem(
-                icon: new Icon(Icons.home), title: titles[0]),
-            new BottomNavigationBarItem(
-                icon: new Icon(Icons.message), title: titles[1]),
-            new BottomNavigationBarItem(
-                icon: new Icon(Icons.cloud), title: titles[2]),
-          ],
-          //设置显示的模式
-          type: BottomNavigationBarType.fixed,
-          //设置当前的索引
-          currentIndex: _tabIndex,
-          //tabBottom的点击监听
-          onTap: (index) {
-            setState(() {
-              _tabIndex = index;
-            });
-          },
-        ));
+      body: new TabBarView(
+        children: <Widget>[new HomePage(), new DiscoveryPage(), new ThirdPage()],
+        controller: controller,
+        physics: new NeverScrollableScrollPhysics(),
+      ),
+      bottomNavigationBar: new Container(
+        color: Colors.white,
+        child: new TabBar(
+            controller: controller,
+            indicatorColor: Colors.transparent,
+            tabs: <IconTap>[
+          new IconTap(
+            icon: _currentIndex == INDEX_HOME
+                ? 'images/home_s.png'
+                : 'images/home_n.png',
+            color: _currentIndex == INDEX_HOME
+                ? const Color(0xFFFC9B84)
+                : Colors.grey,
+            text: titles[INDEX_HOME],
+          ),
+          new IconTap(
+            icon: _currentIndex == INDEX_MESSAGE
+                ? 'images/home_s.png'
+                : 'images/home_n.png',
+            color: _currentIndex == INDEX_MESSAGE
+                ? const Color(0xFFFC9B84)
+                : Colors.grey,
+            text: titles[INDEX_MESSAGE],
+          ),
+          new IconTap(
+            icon: _currentIndex == INDEX_MY
+                ? 'images/home_s.png'
+                : 'images/home_n.png',
+            color: _currentIndex == INDEX_MY
+                ? const Color(0xFFFC9B84)
+                : Colors.grey,
+            text: titles[INDEX_MY],
+          )
+        ]),
+      ),
+    );
   }
 }
