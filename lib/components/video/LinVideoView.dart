@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
-import 'package:flutter_app1/components/video/VideoBottomControlsView.dart';
+import 'package:flutter_app1/components/video/VideoControlsView.dart';
 
 class LinVideoView extends StatefulWidget {
   final double height;
@@ -16,6 +16,8 @@ class LinVideoView extends StatefulWidget {
 }
 
 class _LinVideoViewState extends State<LinVideoView> {
+  bool _hideToolsView = false;
+
   @override
   Widget build(BuildContext context) {
     return new Container(
@@ -35,17 +37,25 @@ class _LinVideoViewState extends State<LinVideoView> {
                     width: MediaQuery.of(context).size.width,
                     child: widget.placeHolder,
                   ),
-            AspectRatio(
-              aspectRatio: MediaQuery.of(context).size.width / widget.height,
-              child: VideoPlayer(
-                widget._controller,
-              ),
-            ),
+            new GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _hideToolsView = !_hideToolsView;
+                  });
+                },
+                child: AspectRatio(
+                  aspectRatio:
+                      MediaQuery.of(context).size.width / widget.height,
+                  child: VideoPlayer(
+                    widget._controller,
+                  ),
+                )),
             new Positioned(
                 top: 0,
-                child: new VideoBottomControlsView(
+                child: new VideoControlsView(
                   widget.height,
                   widget._controller,
+                  _hideToolsView,
                   autoPlay: widget.autoPlay,
                 )),
           ],

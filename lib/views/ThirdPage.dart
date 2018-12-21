@@ -30,4 +30,9 @@ class ThirdPageState extends BaseAliveState<ThirdPage> {
       ),
     ));
   }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 }

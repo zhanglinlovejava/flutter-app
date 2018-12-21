@@ -14,6 +14,7 @@ class _CustomProgressState extends State<CustomProgressBar> {
   VideoPlayerValue _lastestValue;
   int _current = 0;
   int _total = 0;
+  double progressBarHeight = 48;
 
   @override
   void initState() {
@@ -46,12 +47,40 @@ class _CustomProgressState extends State<CustomProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      width: MediaQuery.of(context).size.width,
-      constraints: BoxConstraints(maxHeight: 50),
-      child: new CustomPaint(
-        painter: new ProgressPainter(
-            widget._controller, _lastestValue, _current, _total),
+    void seekToRelativePosition(Offset globalPosition) {
+      final RenderBox box = context.findRenderObject();
+      final Offset tapPos = box.globalToLocal(globalPosition);
+      final double relative = tapPos.dx / box.size.width;
+      final Duration position = _lastestValue.duration * relative;
+      widget._controller.seekTo(position);
+    }
+
+    return new Center(
+      child: new Stack(
+        children: <Widget>[
+          new Positioned(
+              bottom: progressBarHeight / 2,
+              left: 0,
+              right: 0,
+              child: new Container(
+                width: MediaQuery.of(context).size.width,
+                constraints: BoxConstraints(maxHeight: progressBarHeight),
+                child: new CustomPaint(
+                  painter:
+                      new ProgressPainter(widget._controller, _current, _total),
+                ),
+              )),
+          GestureDetector(
+            onHorizontalDragUpdate: (DragUpdateDetails details){
+                if(_lastestValue!=null&&_lastestValue.initialized){
+                  seekToRelativePosition(details.globalPosition);
+                }
+            },
+            child: new Container(
+              color: Colors.transparent,
+            ),
+          )
+        ],
       ),
     );
   }
@@ -59,15 +88,13 @@ class _CustomProgressState extends State<CustomProgressBar> {
 
 class ProgressPainter extends CustomPainter {
   VideoPlayerController _controller;
-  VideoPlayerValue _lastestValue;
   Paint _circlePaint;
   Paint _progressPaint;
   Paint _bgPaint;
   int _current = 0;
   int _total = 0;
 
-  ProgressPainter(
-      this._controller, this._lastestValue, this._current, this._total) {
+  ProgressPainter(this._controller, this._current, this._total) {
     _circlePaint = Paint();
     _circlePaint.color = Colors.white;
     _circlePaint.strokeCap = StrokeCap.round;
