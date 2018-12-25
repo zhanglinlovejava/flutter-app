@@ -161,12 +161,14 @@ class FollowPageState extends BaseAliveState<FollwPage> {
                 child: new Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Image.network(
-                      item['cover']['feed'],
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      height: 180,
-                    ),
+                    new Hero(
+                        tag: item['id'],
+                        child: Image.network(
+                          item['cover']['feed'],
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          height: 180,
+                        )),
                     new Padding(
                       padding: EdgeInsets.only(top: 5),
                       child: new Text(
@@ -200,7 +202,7 @@ class FollowPageState extends BaseAliveState<FollwPage> {
   }
 
   _getFollowList(String url) async {
-    HttpController.getInstance().get(url, (data) {
+   await HttpController.getInstance().get(url, (data) {
       var temList = data['itemList'];
       _itemList.addAll(temList);
       _nextPageUrl = data['nextPageUrl'];

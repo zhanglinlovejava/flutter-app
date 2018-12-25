@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class CustomProgressBar extends StatefulWidget {
-  final VideoPlayerController _controller;
+  final VideoPlayerController controller;
 
-  CustomProgressBar(this._controller);
+  CustomProgressBar(this.controller);
 
   @override
   _CustomProgressState createState() => _CustomProgressState();
 }
 
 class _CustomProgressState extends State<CustomProgressBar> {
+  VideoPlayerController _controller;
   VideoPlayerValue _lastestValue;
   int _current = 0;
   int _total = 0;
@@ -23,13 +24,14 @@ class _CustomProgressState extends State<CustomProgressBar> {
   }
 
   Future _init() async {
-    widget._controller.addListener(_updateState);
+    _controller = widget.controller;
+    _controller.addListener(_updateState);
     _updateState();
   }
 
   void _updateState() {
     setState(() {
-      _lastestValue = widget._controller.value;
+      _lastestValue = _controller.value;
       _current = _lastestValue != null && _lastestValue.duration != null
           ? _lastestValue.duration.inSeconds
           : 1;
@@ -38,10 +40,17 @@ class _CustomProgressState extends State<CustomProgressBar> {
           : 0;
     });
   }
-
+  @override
+  void didUpdateWidget(CustomProgressBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller.dataSource != _controller.dataSource) {
+      _controller.removeListener(_updateState);
+      _init();
+    }
+  }
   @override
   void dispose() {
-    widget._controller.removeListener(_updateState);
+    _controller.removeListener(_updateState);
     super.dispose();
   }
 
@@ -52,7 +61,7 @@ class _CustomProgressState extends State<CustomProgressBar> {
       final Offset tapPos = box.globalToLocal(globalPosition);
       final double relative = tapPos.dx / box.size.width;
       final Duration position = _lastestValue.duration * relative;
-      widget._controller.seekTo(position);
+      _controller.seekTo(position);
     }
 
     return new Center(
@@ -67,7 +76,7 @@ class _CustomProgressState extends State<CustomProgressBar> {
                 constraints: BoxConstraints(maxHeight: progressBarHeight),
                 child: new CustomPaint(
                   painter:
-                      new ProgressPainter(widget._controller, _current, _total),
+                      new ProgressPainter(_controller, _current, _total),
                 ),
               )),
           GestureDetector(

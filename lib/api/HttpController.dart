@@ -45,7 +45,7 @@ class HttpController {
     return cancelToken;
   }
 
-  void get(String url, Function callback,
+  Future get(String url, Function callback,
       {Map<String, String> params,
       Function errorCallback,
       String token}) async {

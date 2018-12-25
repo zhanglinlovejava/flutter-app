@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app1/api/HttpController.dart';
-import 'package:flutter_app1/components/video/CustomVideoPlayer.dart';
 import 'package:flutter_app1/components/loading/loading_view.dart';
 import 'package:flutter_app1/components/loading/LoadingStatus.dart';
 import 'package:flutter_app1/components/loading/platform_adaptive_progress_indicator.dart';
-import 'package:flutter_app1/utils/StringUtil.dart';
+import 'package:flutter_app1/views/VideoPlayPage.dart';
 
 class VideoList extends StatefulWidget {
   @override
@@ -46,15 +45,16 @@ class ListState extends State<VideoList> {
         itemList.addAll(list);
       }
       nextPageUrl = data['nextPageUrl'];
-      setState(() {
-        itemList = itemList;
-        _status = LoadingStatus.success;
-      });
+      if (mounted) {
+        setState(() {
+          itemList = itemList;
+          _status = LoadingStatus.success;
+        });
+      } else {
+        HttpController.getInstance().cancelRequest('videoList');
+      }
     }, errorCallback: (error) {
       print("error:$error");
-      setState(() {
-        _status = LoadingStatus.error;
-      });
     }, token: 'videoList');
   }
 
@@ -94,42 +94,20 @@ class ListState extends State<VideoList> {
               return new Container(
                 child: new Column(
                   children: <Widget>[
-                    new Stack(
-                      alignment: const FractionalOffset(0.5, 0.5),
-                      children: <Widget>[
-                        new Container(
-                          width: double.infinity,
-                          height: 180,
-                          child: new CustomVideoPlayer(
-                            itemList[index]['data']['playUrl'],
-                            itemList[index]['data']['cover']['feed'],
-                            180,
-                            MediaQuery.of(context).size.width,
-                            false,
-                            stopPlay,
-                          ),
-                        ),
-                        new Positioned(
-                          child: new GestureDetector(
-                            onTap: _handleOnTap,
-                            child: new Material(
-                              color: Color.fromRGBO(0, 0, 0, 0.5),
-                              borderRadius: BorderRadius.circular(20),
-                              child: new Padding(
-                                padding: EdgeInsets.fromLTRB(5, 3, 5, 3),
-                                child: new Text(
-                                  StringUtil.formatDuration(
-                                      itemList[index]['data']['duration']),
-                                  style: new TextStyle(
-                                      color: Colors.white, fontSize: 12),
-                                ),
-                              ),
-                            ),
-                          ),
-                          right: 10,
-                          bottom: 40,
-                        )
-                      ],
+                    new GestureDetector(
+                      onTap: () {
+                        _actionVideoPlayPage(itemList[index]['data']);
+                      },
+                      child: new Container(
+                        width: double.infinity,
+                        height: 180,
+                        child: new Hero(
+                            tag: itemList[index]['data']['id'],
+                            child: new Image.network(
+                              itemList[index]['data']['cover']['feed'],
+                              fit: BoxFit.cover,
+                            )),
+                      ),
                     ),
                     _buildVideoInfo(index)
                   ],
@@ -141,10 +119,10 @@ class ListState extends State<VideoList> {
         onRefresh: onRefresh);
   }
 
-  _handleOnTap() {
-    setState(() {
-      stopPlay = !stopPlay;
-    });
+  _actionVideoPlayPage(item) {
+    Navigator.of(context).push(new MaterialPageRoute(builder: (_) {
+      return new VideoPlayPage(item);
+    }));
   }
 
   _buildVideoInfo(index) {
@@ -157,17 +135,17 @@ class ListState extends State<VideoList> {
           ),
           new Expanded(
               child: new Container(
-            padding: EdgeInsets.only(left: 5),
-            child: new Text(
-              itemList[index]['data']['author']['name'],
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-              style: new TextStyle(
-                color: Colors.black,
-                fontSize: 15,
-              ),
-            ),
-          )),
+                padding: EdgeInsets.only(left: 5),
+                child: new Text(
+                  itemList[index]['data']['author']['name'],
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: new TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                  ),
+                ),
+              )),
           new Padding(
             padding: EdgeInsets.only(right: 10),
             child: new Text(
@@ -200,7 +178,7 @@ class ListState extends State<VideoList> {
 
   @override
   void dispose() {
-    HttpController.getInstance().cancelRequest('videoList');
+//    HttpController.getInstance().cancelRequest('videoList');
     super.dispose();
   }
 }

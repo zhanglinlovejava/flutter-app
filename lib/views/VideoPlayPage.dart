@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app1/components/video/CustomVideoPlayer.dart';
+import 'package:flutter_app1/components/video/LinVideoView.dart';
 import 'package:flutter_app1/utils/StringUtil.dart';
 import 'package:flutter_app1/api/HttpController.dart';
+import 'package:video_player/video_player.dart';
 
 class VideoPlayPage extends StatefulWidget {
   final Object item;
@@ -17,13 +18,13 @@ class VideoPlayPage extends StatefulWidget {
 class VideoPlayState extends State<VideoPlayPage> {
   var _itemData;
   var _itemList = new List();
-  var _stopPlay = false;
-  var _replay = false;
+  VideoPlayerController _controller;
 
   @override
   void initState() {
     super.initState();
     _itemData = widget.item;
+    _controller = VideoPlayerController.network(_itemData['playUrl']);
     _getRelatedList();
   }
 
@@ -63,14 +64,16 @@ class VideoPlayState extends State<VideoPlayPage> {
             new Container(
               height: 180,
               width: MediaQuery.of(context).size.width,
-              child: new CustomVideoPlayer(
-                _itemData['playUrl'],
-                _itemData['cover']['feed'],
-                180,
-                MediaQuery.of(context).size.width,
-                true,
-                _stopPlay,
-              ),
+              child: new LinVideoView(
+                  controller: _controller,
+                  placeHolder: new Hero(
+                      tag: _itemData['id'],
+                      child: new Image(
+                        image: NetworkImage(_itemData['cover']['feed']),
+                        fit: BoxFit.cover,
+                      )),
+                  height: 180,
+                  autoPlay: false),
             ),
           ],
         ));
@@ -243,8 +246,8 @@ class VideoPlayState extends State<VideoPlayPage> {
   }
 
   _onItemTap(_item) {
+    _controller = VideoPlayerController.network(_item['playUrl']);
     setState(() {
-      _stopPlay = true;
       _itemData = _item;
     });
     _getRelatedList();
@@ -317,21 +320,13 @@ class VideoPlayState extends State<VideoPlayPage> {
   _getRelatedList() async {
     Map<String, String> params = new Map();
     params['id'] = _itemData['id'].toString();
-    HttpController.getInstance().get(
-        'v4/video/related',
-        (data) {
-          var itemList = data['itemList'];
-          setState(() {
-            _itemList = itemList;
-            _replay = true;
-          });
-          setState(() {
-            _replay = false;
-          });
-        },
-        params: params,
-        errorCallback: (error) {
-          setState(() {});
+    await HttpController.getInstance().get('v4/video/related', (data) {
+      var itemList = data['itemList'];
+      if (mounted) {
+        setState(() {
+          _itemList = itemList;
         });
+      }
+    }, params: params);
   }
 }

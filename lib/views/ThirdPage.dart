@@ -22,17 +22,17 @@ class ThirdPageState extends BaseAliveState<ThirdPage> {
   Widget build(BuildContext context) {
     return new Container(
         child: new LinVideoView(
-      _controller,
-      autoPlay: false,
+      controller: _controller,
+      height: 180,
       placeHolder: new Image.network(
         'http://img.kaiyanapp.com/10ca092141fa2a28524b5cc400f4fc86.png?imageMogr2/quality/60/format/jpg',
         fit: BoxFit.cover,
       ),
     ));
   }
+
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 }

@@ -29,7 +29,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage>
-    with SingleTickerProviderStateMixin{
+    with SingleTickerProviderStateMixin {
   TabController controller;
   VoidCallback onChange;
   int _currentIndex = 0;
@@ -66,7 +66,11 @@ class _MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     return new Scaffold(
       body: new TabBarView(
-        children: <Widget>[new HomePage(), new DiscoveryPage(), new ThirdPage()],
+        children: <Widget>[
+          new HomePage(),
+          new DiscoveryPage(),
+          new ThirdPage()
+        ],
         controller: controller,
         physics: new NeverScrollableScrollPhysics(),
       ),
@@ -76,34 +80,34 @@ class _MyHomePageState extends State<MyHomePage>
             controller: controller,
             indicatorColor: Colors.transparent,
             tabs: <IconTap>[
-          new IconTap(
-            icon: _currentIndex == INDEX_HOME
-                ? 'images/home_s.png'
-                : 'images/home_n.png',
-            color: _currentIndex == INDEX_HOME
-                ? const Color(0xFFFC9B84)
-                : Colors.grey,
-            text: titles[INDEX_HOME],
-          ),
-          new IconTap(
-            icon: _currentIndex == INDEX_MESSAGE
-                ? 'images/home_s.png'
-                : 'images/home_n.png',
-            color: _currentIndex == INDEX_MESSAGE
-                ? const Color(0xFFFC9B84)
-                : Colors.grey,
-            text: titles[INDEX_MESSAGE],
-          ),
-          new IconTap(
-            icon: _currentIndex == INDEX_MY
-                ? 'images/home_s.png'
-                : 'images/home_n.png',
-            color: _currentIndex == INDEX_MY
-                ? const Color(0xFFFC9B84)
-                : Colors.grey,
-            text: titles[INDEX_MY],
-          )
-        ]),
+              new IconTap(
+                icon: _currentIndex == INDEX_HOME
+                    ? 'images/home_s.png'
+                    : 'images/home_n.png',
+                color: _currentIndex == INDEX_HOME
+                    ? const Color(0xFFFC9B84)
+                    : Colors.grey,
+                text: titles[INDEX_HOME],
+              ),
+              new IconTap(
+                icon: _currentIndex == INDEX_MESSAGE
+                    ? 'images/home_s.png'
+                    : 'images/home_n.png',
+                color: _currentIndex == INDEX_MESSAGE
+                    ? const Color(0xFFFC9B84)
+                    : Colors.grey,
+                text: titles[INDEX_MESSAGE],
+              ),
+              new IconTap(
+                icon: _currentIndex == INDEX_MY
+                    ? 'images/home_s.png'
+                    : 'images/home_n.png',
+                color: _currentIndex == INDEX_MY
+                    ? const Color(0xFFFC9B84)
+                    : Colors.grey,
+                text: titles[INDEX_MY],
+              )
+            ]),
       ),
     );
   }

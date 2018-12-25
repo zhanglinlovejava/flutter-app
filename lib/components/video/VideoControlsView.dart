@@ -3,23 +3,34 @@ import 'package:flutter_app1/components/video/CustomProgressBar.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_app1/utils/StringUtil.dart';
 import 'package:flutter_app1/components/loading/platform_adaptive_progress_indicator.dart';
+import 'dart:async';
 
 class VideoControlsView extends StatefulWidget {
-  final VideoPlayerController _controller;
+  final VideoPlayerController controller;
   final double height;
   final bool autoPlay;
-  final bool _hideToolsView;
+  final bool hideToolsView;
+  final Future<dynamic> Function() toggleFullScreen;
+  final bool isScreen;
 
-  VideoControlsView(this.height, this._controller, this._hideToolsView,
-      {this.autoPlay = false});
+  VideoControlsView(
+      {Key key,
+      @required this.height,
+      @required this.controller,
+      @required this.hideToolsView,
+      @required this.isScreen,
+      @required this.toggleFullScreen,
+      this.autoPlay = false})
+      : super(key: key);
 
   @override
   _VideoControlsViewState createState() => _VideoControlsViewState();
 }
 
 class _VideoControlsViewState extends State<VideoControlsView> {
-  VideoPlayerValue _lastestValue;
+  VideoPlayerValue _latestValue;
   bool _showLoading = false;
+  VideoPlayerController _controller;
 
   @override
   void initState() {
@@ -28,13 +39,15 @@ class _VideoControlsViewState extends State<VideoControlsView> {
   }
 
   Future _initVideoController() async {
-    await widget._controller.initialize();
-    await widget._controller.play();
+    await _controller.initialize();
+    await _controller.play();
   }
 
   Future _init() async {
-    widget._controller.addListener(_updateState);
+    _controller = widget.controller;
+    _controller.addListener(_updateState);
     _updateState();
+
     if (widget.autoPlay) {
       _firstPlay();
     }
@@ -52,11 +65,11 @@ class _VideoControlsViewState extends State<VideoControlsView> {
   }
 
   void _togglePlay() {
-    if (_lastestValue != null && _lastestValue.initialized) {
-      if (_lastestValue.isPlaying) {
-        widget._controller.pause();
+    if (_latestValue != null && _latestValue.initialized) {
+      if (_latestValue.isPlaying) {
+        _controller.pause();
       } else {
-        widget._controller.play();
+        _controller.play();
       }
     } else {
       _firstPlay();
@@ -65,13 +78,13 @@ class _VideoControlsViewState extends State<VideoControlsView> {
 
   @override
   void dispose() {
-    widget._controller.removeListener(_updateState);
+    _controller.removeListener(_updateState);
     super.dispose();
   }
 
   void _updateState() {
     setState(() {
-      _lastestValue = widget._controller.value;
+      _latestValue = _controller.value;
     });
   }
 
@@ -107,9 +120,13 @@ class _VideoControlsViewState extends State<VideoControlsView> {
   _buildCenterPlayBtn() {
     return new Positioned(
       left: MediaQuery.of(context).size.width / 2 - 25,
-      top: widget.height / 2 - 25,
+      top: (widget.isScreen
+                  ? MediaQuery.of(context).size.height
+                  : widget.height) /
+              2 -
+          25,
       child: new Offstage(
-        offstage: widget._hideToolsView || _showLoading,
+        offstage: widget.hideToolsView || _showLoading,
         child: new GestureDetector(
           onTap: _togglePlay,
           child: new Container(
@@ -118,9 +135,9 @@ class _VideoControlsViewState extends State<VideoControlsView> {
                 color: Color.fromRGBO(0, 0, 0, 0.4),
                 borderRadius: BorderRadius.all(Radius.circular(30))),
             child: new Icon(
-              _lastestValue != null &&
-                      _lastestValue.initialized &&
-                      _lastestValue.isPlaying
+              _latestValue != null &&
+                      _latestValue.initialized &&
+                      _latestValue.isPlaying
                   ? Icons.pause
                   : Icons.play_arrow,
               color: Colors.white,
@@ -134,11 +151,13 @@ class _VideoControlsViewState extends State<VideoControlsView> {
 
   _buildBottomBar() {
     return new Positioned(
-        top: widget.height - 40,
+        top: (widget.isScreen
+                ? MediaQuery.of(context).size.height
+                : widget.height) -
+            40,
         child: new Offstage(
-            offstage: !(_lastestValue != null &&
-                    _lastestValue.initialized) ||
-                    widget._hideToolsView ||
+            offstage: !(_latestValue != null && _latestValue.initialized) ||
+                widget.hideToolsView ||
                 _showLoading,
             child: new Container(
                 height: 48,
@@ -155,9 +174,9 @@ class _VideoControlsViewState extends State<VideoControlsView> {
                     new Padding(
                       padding: EdgeInsets.only(left: 5),
                       child: new Text(
-                        StringUtil.formatDuration(_lastestValue != null &&
-                                _lastestValue.position != null
-                            ? _lastestValue.position.inSeconds
+                        StringUtil.formatDuration(_latestValue != null &&
+                                _latestValue.position != null
+                            ? _latestValue.position.inSeconds
                             : 0),
                         style: TextStyle(fontSize: 12, color: Colors.white),
                       ),
@@ -165,22 +184,27 @@ class _VideoControlsViewState extends State<VideoControlsView> {
                     new Expanded(
                         child: new Container(
                       margin: EdgeInsets.only(left: 10, right: 10),
-                      child: new CustomProgressBar(widget._controller),
+                      child: new CustomProgressBar(_controller),
                     )),
                     new Padding(
                       padding: EdgeInsets.only(right: 5),
                       child: new Text(
-                        StringUtil.formatDuration(_lastestValue != null &&
-                                _lastestValue.duration != null
-                            ? _lastestValue.duration.inSeconds
+                        StringUtil.formatDuration(_latestValue != null &&
+                                _latestValue.duration != null
+                            ? _latestValue.duration.inSeconds
                             : 0),
                         style: TextStyle(fontSize: 12, color: Colors.white),
                       ),
                     ),
-                    new Icon(
-                      Icons.fullscreen,
-                      color: Colors.white,
-                      size: 25,
+                    new GestureDetector(
+                      onTap: () => widget.toggleFullScreen(),
+                      child: new Icon(
+                        widget.isScreen
+                            ? Icons.fullscreen_exit
+                            : Icons.fullscreen,
+                        color: Colors.white,
+                        size: 25,
+                      ),
                     ),
                   ],
                 ))));
