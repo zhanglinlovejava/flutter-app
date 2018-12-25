@@ -51,7 +51,6 @@ class VideoPlayState extends State<VideoPlayPage> {
                   itemBuilder: (BuildContext context, int index) {
                     var _item = _itemList[index]['data'];
                     var type = _itemList[index]['type'];
-                    print('type=$type');
                     if (index == 0) {
                       return _buildVideoInfo(context);
                     } else if (type == 'videoSmallCard') {
@@ -65,15 +64,17 @@ class VideoPlayState extends State<VideoPlayPage> {
               height: 180,
               width: MediaQuery.of(context).size.width,
               child: new LinVideoView(
-                  controller: _controller,
-                  placeHolder: new Hero(
-                      tag: _itemData['id'],
-                      child: new Image(
-                        image: NetworkImage(_itemData['cover']['feed']),
-                        fit: BoxFit.cover,
-                      )),
-                  height: 180,
-                  autoPlay: false),
+                controller: _controller,
+                placeHolder: new Hero(
+                    tag: _itemData['id'],
+                    child: new Image(
+                      image: NetworkImage(_itemData['cover']['feed']),
+                      fit: BoxFit.cover,
+                    )),
+                height: 180,
+                autoPlay: false,
+                title: _itemData['title'],
+              ),
             ),
           ],
         ));
@@ -191,9 +192,10 @@ class VideoPlayState extends State<VideoPlayPage> {
             _item['text'],
             style: TextStyle(color: Colors.white, fontSize: 14),
           ),
-          new Icon(
-            Icons.arrow_right,
-            color: Colors.white,
+          new Image(
+            image: AssetImage('images/arrow-right.png'),
+            width: 30,
+            height: 15,
           )
         ],
       ),
@@ -246,9 +248,9 @@ class VideoPlayState extends State<VideoPlayPage> {
   }
 
   _onItemTap(_item) {
-    _controller = VideoPlayerController.network(_item['playUrl']);
     setState(() {
       _itemData = _item;
+      _controller = VideoPlayerController.network(_item['playUrl']);
     });
     _getRelatedList();
   }

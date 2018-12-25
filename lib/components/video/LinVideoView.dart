@@ -8,19 +8,20 @@ class LinVideoView extends StatefulWidget {
   final bool autoPlay;
   final Widget placeHolder;
   final VideoPlayerController controller;
+  final String title;
 
   LinVideoView(
       {@required this.controller,
       @required this.height,
       this.autoPlay = false,
-      this.placeHolder});
+      this.placeHolder,
+      this.title = ''});
 
   @override
   _LinVideoViewState createState() => _LinVideoViewState();
 }
 
 class _LinVideoViewState extends State<LinVideoView> {
-  bool _hideToolsView = false;
   bool _isScreen = false;
   VideoPlayerController _controller;
 
@@ -100,7 +101,6 @@ class _LinVideoViewState extends State<LinVideoView> {
                 toggleFullScreen: () {
                   setState(() {
                     _isScreen = false;
-                    _hideToolsView = false;
                   });
                   new Future<dynamic>.value(Navigator.of(context).pop());
                 },
@@ -108,7 +108,6 @@ class _LinVideoViewState extends State<LinVideoView> {
               onWillPop: () {
                 setState(() {
                   _isScreen = false;
-                  _hideToolsView = false;
                 });
                 new Future.value(Navigator.of(context).pop());
               })),
@@ -125,28 +124,21 @@ class _LinVideoViewState extends State<LinVideoView> {
     return new Stack(
       children: <Widget>[
         isFull ? new Container() : _buildPlaceHolder(),
-        new GestureDetector(
-            onTap: () {
-              setState(() {
-                _hideToolsView = !_hideToolsView;
-              });
-            },
-            child: AspectRatio(
-              aspectRatio: ratio,
-              child: VideoPlayer(
-                _controller,
-              ),
-            )),
+        AspectRatio(
+          aspectRatio: ratio,
+          child: VideoPlayer(
+            _controller,
+          ),
+        ),
         new Positioned(
             top: 0,
             child: new VideoControlsView(
-              key: key,
               height: height,
               controller: _controller,
-              hideToolsView: _hideToolsView,
               isScreen: isScreen,
               toggleFullScreen: toggleFullScreen,
               autoPlay: widget.autoPlay,
+              title: widget.title,
             )),
       ],
     );
@@ -184,5 +176,14 @@ class _LinVideoViewState extends State<LinVideoView> {
     if (_controller != null) {
       _controller.dispose();
     }
+  }
+  @override
+  void didUpdateWidget(LinVideoView oldWidget) {
+    if (widget.controller.dataSource != _controller.dataSource) {
+      setState(() {
+        _controller = widget.controller;
+      });
+    }
+    super.didUpdateWidget(oldWidget);
   }
 }

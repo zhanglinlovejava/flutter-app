@@ -3,8 +3,9 @@ import 'package:video_player/video_player.dart';
 
 class CustomProgressBar extends StatefulWidget {
   final VideoPlayerController controller;
+  final String type;
 
-  CustomProgressBar(this.controller);
+  CustomProgressBar(this.controller, {this.type = 'normal'});
 
   @override
   _CustomProgressState createState() => _CustomProgressState();
@@ -12,7 +13,7 @@ class CustomProgressBar extends StatefulWidget {
 
 class _CustomProgressState extends State<CustomProgressBar> {
   VideoPlayerController _controller;
-  VideoPlayerValue _lastestValue;
+  VideoPlayerValue _latestValue;
   int _current = 0;
   int _total = 0;
   double progressBarHeight = 48;
@@ -20,6 +21,7 @@ class _CustomProgressState extends State<CustomProgressBar> {
   @override
   void initState() {
     super.initState();
+    progressBarHeight = widget.type == 'normal' ? progressBarHeight : 20;
     _init();
   }
 
@@ -31,37 +33,28 @@ class _CustomProgressState extends State<CustomProgressBar> {
 
   void _updateState() {
     setState(() {
-      _lastestValue = _controller.value;
-      _current = _lastestValue != null && _lastestValue.duration != null
-          ? _lastestValue.duration.inSeconds
+      _latestValue = _controller.value;
+      _current = _latestValue != null && _latestValue.duration != null
+          ? _latestValue.duration.inSeconds
           : 1;
-      _total = _lastestValue != null && _lastestValue.position != null
-          ? _lastestValue.position.inSeconds
+      _total = _latestValue != null && _latestValue.position != null
+          ? _latestValue.position.inSeconds
           : 0;
     });
-  }
-  @override
-  void didUpdateWidget(CustomProgressBar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.controller.dataSource != _controller.dataSource) {
-      _controller.removeListener(_updateState);
-      _init();
-    }
-  }
-  @override
-  void dispose() {
-    _controller.removeListener(_updateState);
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     void seekToRelativePosition(Offset globalPosition) {
-      final RenderBox box = context.findRenderObject();
-      final Offset tapPos = box.globalToLocal(globalPosition);
-      final double relative = tapPos.dx / box.size.width;
-      final Duration position = _lastestValue.duration * relative;
-      _controller.seekTo(position);
+      if (_latestValue != null &&
+          _latestValue.initialized &&
+          widget.type == 'normal') {
+        final RenderBox box = context.findRenderObject();
+        final Offset tapPos = box.globalToLocal(globalPosition);
+        final double relative = tapPos.dx / box.size.width;
+        final Duration position = _latestValue.duration * relative;
+        _controller.seekTo(position);
+      }
     }
 
     return new Center(
@@ -75,15 +68,16 @@ class _CustomProgressState extends State<CustomProgressBar> {
                 width: MediaQuery.of(context).size.width,
                 constraints: BoxConstraints(maxHeight: progressBarHeight),
                 child: new CustomPaint(
-                  painter:
-                      new ProgressPainter(_controller, _current, _total),
+                  painter: new ProgressPainter(_controller, _current, _total,
+                      type: widget.type),
                 ),
               )),
           GestureDetector(
-            onHorizontalDragUpdate: (DragUpdateDetails details){
-                if(_lastestValue!=null&&_lastestValue.initialized){
-                  seekToRelativePosition(details.globalPosition);
-                }
+            onHorizontalDragUpdate: (DragUpdateDetails details) {
+              seekToRelativePosition(details.globalPosition);
+            },
+            onTapDown: (TapDownDetails details) {
+              seekToRelativePosition(details.globalPosition);
             },
             child: new Container(
               color: Colors.transparent,
@@ -102,8 +96,9 @@ class ProgressPainter extends CustomPainter {
   Paint _bgPaint;
   int _current = 0;
   int _total = 0;
+  String type = 'normal';
 
-  ProgressPainter(this._controller, this._current, this._total) {
+  ProgressPainter(this._controller, this._current, this._total, {this.type}) {
     _circlePaint = Paint();
     _circlePaint.color = Colors.white;
     _circlePaint.strokeCap = StrokeCap.round;
@@ -115,14 +110,14 @@ class ProgressPainter extends CustomPainter {
     _progressPaint.color = Colors.red;
     _progressPaint.strokeCap = StrokeCap.round;
     _progressPaint.style = PaintingStyle.fill;
-    _progressPaint.strokeWidth = 4;
+    _progressPaint.strokeWidth = type == 'normal' ? 1 : 3;
     _progressPaint.isAntiAlias = true;
 
     _bgPaint = Paint();
-    _bgPaint.color = Colors.grey;
+    _bgPaint.color = Colors.white70;
     _bgPaint.strokeCap = StrokeCap.round;
     _bgPaint.style = PaintingStyle.fill;
-    _bgPaint.strokeWidth = 4;
+    _bgPaint.strokeWidth = type == 'normal' ? 1 : 3;
     _bgPaint.isAntiAlias = true;
   }
 
@@ -131,8 +126,10 @@ class ProgressPainter extends CustomPainter {
     canvas.drawLine(Offset(0, 0), Offset(size.width, 0), _bgPaint);
     canvas.drawLine(Offset(0, 0), Offset((size.width / _current * _total), 0),
         _progressPaint);
-    canvas.drawCircle(
-        Offset(size.width / _current * _total, 0), 6, _circlePaint);
+    if (type == 'normal') {
+      canvas.drawCircle(
+          Offset(size.width / _current * _total, 0), 6, _circlePaint);
+    }
   }
 
   @override

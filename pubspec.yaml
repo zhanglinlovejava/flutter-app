@@ -47,6 +47,8 @@ flutter:
       - images/circle.png
       - images/pause.png
       - images/comment.png
+      - images/back.png
+      - images/arrow-right.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
