@@ -16,14 +16,17 @@ class HttpController {
 
   HttpController() {
     options = Options(
-      baseUrl: 'http://baobab.kaiyanapp.com/api/',
-      connectTimeout: 10000,
-      receiveTimeout: 2000,
-      headers: {
-        "User-Agent":
-            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63",
-      },
-    );
+        baseUrl: 'http://baobab.kaiyanapp.com/api/',
+        connectTimeout: 10000,
+        receiveTimeout: 10000,
+        headers: {
+          "User-Agent":
+              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63",
+        },
+        data: {
+          'udid': 'efa9668e70684bdcacc9fa33b6fbc405c3d770a2'
+//          'udid': '2bad2287b35b4303a340cdfba488af4526d1e2ca'
+        });
     dio = new Dio(options);
   }
 
@@ -50,7 +53,7 @@ class HttpController {
       Function errorCallback,
       String token}) async {
     if (params != null && params.isNotEmpty) {
-      StringBuffer sb = new StringBuffer("?");
+      StringBuffer sb = new StringBuffer('?');
       params.forEach((key, value) {
         sb.write("$key" + "=" + "$value" + "&");
       });
@@ -70,6 +73,13 @@ class HttpController {
       print('error:===$e');
       if (CancelToken.isCancel(e)) {
         print('get请求取消!---------- ' + e.message);
+        return;
+      }
+      if (e.type == DioErrorType.CONNECT_TIMEOUT ||
+          e.type == DioErrorType.RECEIVE_TIMEOUT) {
+        if (errorCallback != null) {
+          errorCallback('网络超时，请稍后重试~');
+        }
         return;
       }
       if (errorCallback != null) {

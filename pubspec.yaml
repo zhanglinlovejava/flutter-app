@@ -1,4 +1,4 @@
-name: flutter_app1
+name: flutter_open
 description: A new Flutter application.
 
 # The following defines the version and build number for your application.
@@ -20,14 +20,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   dio: ^1.0.9
-  cached_network_image: ^0.4.1
-  flutter_cache_manager: ^0.1.1
-  transparent_image: ^0.1.0
   video_player: ^0.8.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
@@ -40,15 +37,8 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-      - images/avatar.jpg
-      - images/home_s.png
-      - images/home_n.png
-      - images/play.png
-      - images/circle.png
-      - images/pause.png
-      - images/comment.png
-      - images/back.png
-      - images/arrow-right.png
+         - asset/images/
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -66,12 +56,14 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+  fonts:
+    - family: Lobster
+      fonts:
+        - asset: asset/fonts/Lobster-1.4.otf
+    - family: FZLanTing
+      fonts:
+        - asset: asset/fonts/FZLanTingHeiS-DB1-GB-Regular.TTF
+
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

@@ -35,4 +35,14 @@ class StringUtil {
     }
     return tagStr;
   }
+
+  static formatMileToDate({int miles = 0, String separator = '/'}) {
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(miles);
+    var year = dateTime.year;
+    int month = dateTime.month;
+    int day = dateTime.day;
+    String monthStr = month < 10 ? '0$month' : month.toString();
+    String dayStr = day < 10 ? '0$day' : day.toString();
+    return '$year$separator$monthStr$separator$dayStr';
+  }
 }

@@ -1,22 +1,34 @@
 import 'package:flutter/material.dart';
-import 'views/HomePage.dart';
-import 'views/DiscoveryPage.dart';
-import 'views/ThirdPage.dart';
-import 'components/IconTap.dart';
+import 'component/IconTap.dart';
+import 'package:flutter_open/pages/home/HomePage.dart';
+import 'pages/NotificationPage.dart';
+import 'pages/CommunityPage.dart';
+import 'pages/MinePage.dart';
+import 'dart:io';
+import 'package:flutter/services.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MyApp());
+  if (Platform.isAndroid) {
+    SystemUiOverlayStyle systemUiOverlayStyle =
+        SystemUiOverlayStyle(statusBarColor: Colors.black);
+    SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
+  }
+}
+
 const int INDEX_HOME = 0;
-const int INDEX_MESSAGE = 1;
-const int INDEX_MY = 2;
+const int INDEX_COMMUNITY = 1;
+const int INDEX_NOTIFICATION = 2;
+const int INDEX_MY = 3;
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: const Color(0xffffffff),
+        primaryColor: Colors.black,
       ),
       home: MyHomePage(),
     );
@@ -33,15 +45,10 @@ class _MyHomePageState extends State<MyHomePage>
   TabController controller;
   VoidCallback onChange;
   int _currentIndex = 0;
-  var titles = <String>['列表', '发现', '通知'];
-  var bodys = [];
+  var titles = <String>['首页', '社区', '通知', '我的'];
 
   _MyHomePageState() {
-    var first = new HomePage();
-    var second = new DiscoveryPage();
-    var third = new ThirdPage();
-    bodys = [first, second, third];
-    controller = new TabController(length: 3, vsync: this);
+    controller = new TabController(length: 4, vsync: this);
     onChange = () {
       setState(() {
         _currentIndex = controller.index;
@@ -51,25 +58,14 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    controller.removeListener(onChange);
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
       body: new TabBarView(
         children: <Widget>[
           new HomePage(),
-          new DiscoveryPage(),
-          new ThirdPage()
+          new CommunityPage(),
+          new NotificationPage(),
+          new MinePage()
         ],
         controller: controller,
         physics: new NeverScrollableScrollPhysics(),
@@ -79,32 +75,37 @@ class _MyHomePageState extends State<MyHomePage>
         child: new TabBar(
             controller: controller,
             indicatorColor: Colors.transparent,
-            tabs: <IconTap>[
+            tabs: <Widget>[
               new IconTap(
                 icon: _currentIndex == INDEX_HOME
-                    ? 'images/home_s.png'
-                    : 'images/home_n.png',
-                color: _currentIndex == INDEX_HOME
-                    ? const Color(0xFFFC9B84)
-                    : Colors.grey,
+                    ? 'asset/images/tab_home_s.png'
+                    : 'asset/images/tab_home_n.png',
+                color: _currentIndex == INDEX_HOME ? Colors.black : Colors.grey,
                 text: titles[INDEX_HOME],
               ),
               new IconTap(
-                icon: _currentIndex == INDEX_MESSAGE
-                    ? 'images/home_s.png'
-                    : 'images/home_n.png',
-                color: _currentIndex == INDEX_MESSAGE
-                    ? const Color(0xFFFC9B84)
+                icon: _currentIndex == INDEX_COMMUNITY
+                    ? 'asset/images/tab_follow_s.png'
+                    : 'asset/images/tab_follow_n.png',
+                color: _currentIndex == INDEX_COMMUNITY
+                    ? Colors.black
                     : Colors.grey,
-                text: titles[INDEX_MESSAGE],
+                text: titles[INDEX_COMMUNITY],
+              ),
+              new IconTap(
+                icon: _currentIndex == INDEX_NOTIFICATION
+                    ? 'asset/images/tab_notification_s.png'
+                    : 'asset/images/tab_notification_n.png',
+                color: _currentIndex == INDEX_NOTIFICATION
+                    ? Colors.black
+                    : Colors.grey,
+                text: titles[INDEX_NOTIFICATION],
               ),
               new IconTap(
                 icon: _currentIndex == INDEX_MY
-                    ? 'images/home_s.png'
-                    : 'images/home_n.png',
-                color: _currentIndex == INDEX_MY
-                    ? const Color(0xFFFC9B84)
-                    : Colors.grey,
+                    ? 'asset/images/tab_mine_s.png'
+                    : 'asset/images/tab_mine_n.png',
+                color: _currentIndex == INDEX_MY ? Colors.black : Colors.grey,
                 text: titles[INDEX_MY],
               )
             ]),
