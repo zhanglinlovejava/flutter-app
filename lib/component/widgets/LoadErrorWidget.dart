@@ -10,18 +10,23 @@ class LoadErrorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return new GestureDetector(
       onTap: onRetryFunc,
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          new Icon(
-            Icons.error,
-            color: Colors.red,
-          ),
-          Text(
-            errMsg,
-            style: new TextStyle(fontSize: 18),
-          )
-        ],
+      child: Container(
+        child: new Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Icon(
+              Icons.error,
+              color: Colors.red,
+            ),
+            Text(
+              errMsg,
+              style: new TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.normal,
+                  decoration: TextDecoration.none),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -5,12 +5,13 @@ import 'package:flutter_open/component/loading/LoadingStatus.dart';
 import 'package:flutter_open/component/loading/platform_adaptive_progress_indicator.dart';
 import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
 import 'package:flutter_open/component/widgets/AutoPlayFollowCardWidget.dart';
-
+import 'package:flutter_open/component/BaseAliveState.dart';
+import 'package:flutter_open/api/API.dart';
 class FollowPage extends StatefulWidget {
   _FollowPageState createState() => _FollowPageState();
 }
 
-class _FollowPageState extends State<FollowPage> {
+class _FollowPageState extends BaseAliveSate<FollowPage> {
   List _itemList = [];
   LoadingStatus _status = LoadingStatus.loading;
   String _errMsg;
@@ -48,7 +49,7 @@ class _FollowPageState extends State<FollowPage> {
   }
 
   _fetchFollowList() {
-    HttpController.getInstance().get('v6/community/tab/follow', (data) {
+    HttpController.getInstance().get(API.FOLLOW_LIST, (data) {
       List list = data['itemList'];
       _itemList = list;
       _status = LoadingStatus.success;

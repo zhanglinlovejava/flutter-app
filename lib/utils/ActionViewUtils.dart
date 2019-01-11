@@ -18,6 +18,8 @@ class ActionViewUtils {
             end: Alignment.bottomCenter));
   }
 
+
+
   static buildDuration(int duration) {
     return new Positioned(
         right: 10,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
+import 'AuthorInfoWidget.dart';
 
 class FollowCardWidget extends StatelessWidget {
   final String cover;
@@ -10,6 +11,8 @@ class FollowCardWidget extends StatelessWidget {
   final int duration;
   final bool showBottomAvatar;
   final VoidCallback onCoverTap;
+  final String id;
+  final String userType;
 
   FollowCardWidget({
     @required this.cover,
@@ -18,6 +21,8 @@ class FollowCardWidget extends StatelessWidget {
     @required this.title,
     @required this.heroTag,
     @required this.duration,
+    @required this.id,
+    @required this.userType,
     this.showBottomAvatar = true,
     this.onCoverTap,
   });
@@ -53,60 +58,17 @@ class FollowCardWidget extends StatelessWidget {
               ActionViewUtils.buildDuration(duration)
             ],
           ),
-          new Container(
-            margin: EdgeInsets.only(top: 10, bottom: 15),
-            child: new Row(
-              children: <Widget>[
-                showBottomAvatar
-                    ? new ClipOval(
-                        child: new Image.network(
-                          avatar,
-                          width: 40,
-                          height: 40,
-                        ),
-                      )
-                    : new Container(),
-                Expanded(
-                  child: new Container(
-                    padding: EdgeInsets.only(left: 10),
-                    child: new Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        new Text(
-                          title,
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'FZLanTing'),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        new Padding(
-                          padding: EdgeInsets.only(top: 5),
-                          child: new Text(
-                            desc,
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 12,
-                                fontFamily: 'FZLanTing'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                new Container(
-                  margin: EdgeInsets.only(right: 10, left: 10),
-                  child: Icon(
-                    Icons.share,
-                    size: 20,
-                    color: Colors.grey,
-                  ),
-                )
-              ],
+          Padding(
+            padding: EdgeInsets.only(top: 10,right: 5,bottom: 10),
+            child: AuthorInfoWidget(
+              name: title,
+              desc: desc,
+              avatar: avatar,
+              id: id,
+              userType: userType,
+              isDark: true,
+              rightBtnType: 'share',
+              showAvatar: showBottomAvatar,
             ),
           )
         ],

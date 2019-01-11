@@ -8,7 +8,7 @@ class TextCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Container(
-      padding: EdgeInsets.only(bottom: 10, top: 10),
+      padding: EdgeInsets.only(bottom: 10, top: 15),
       child: new Row(
         children: <Widget>[
           new Text(

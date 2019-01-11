@@ -15,12 +15,15 @@ import 'package:flutter_open/component/widgets/DynamicInfoCardWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
 import 'package:flutter_open/component/widgets/FollowCardWidget.dart';
 import 'package:flutter_open/component/widgets/TheEndWidget.dart';
+import 'package:flutter_open/component/BaseAliveState.dart';
+import 'package:flutter_open/api/API.dart';
+import 'package:flutter_open/component/widgets/VideoCollectionWithBriefWidget.dart';
 
 class DiscoveryPage extends StatefulWidget {
   _DiscoveryPageState createState() => _DiscoveryPageState();
 }
 
-class _DiscoveryPageState extends State<DiscoveryPage> {
+class _DiscoveryPageState extends BaseAliveSate<DiscoveryPage> {
   List _itemList = [];
   LoadingStatus _status = LoadingStatus.loading;
   String _errMsg;
@@ -80,6 +83,8 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                     heroTag: data['content']['data']['id'],
                     desc: data['header']['description'],
                     duration: data['content']['data']['duration'],
+                    id: data['content']['data']['author']['id'].toString(),
+                    userType: 'PGC',
                     onCoverTap: () {
                       ActionViewUtils.actionVideoPlayPage(
                           context, data['content']['data']);
@@ -93,7 +98,7 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
                 } else if (type == 'horizontalScrollCard') {
                   return HorizontalScrollCardWidget(itemList: data['itemList']);
                 } else if (type == 'videoCollectionWithBrief') {
-                  return _renderVideoCollectionWithBrief(data);
+                  return VideoCollectionWithBriefWidget(data);
                 } else if (type == 'DynamicInfoCard') {
                   return DynamicInfoCardWidget(data);
                 } else {
@@ -103,32 +108,8 @@ class _DiscoveryPageState extends State<DiscoveryPage> {
         ));
   }
 
-  _renderVideoCollectionWithBrief(data) {
-    return new Container(
-      child: new Column(
-        children: <Widget>[
-          new Padding(
-            padding: EdgeInsets.only(bottom: 5),
-            child: AuthorInfoWidget(
-              name: data['header']['title'],
-              desc: data['header']['description'],
-              avatar: data['header']['icon'],
-              isDark: true,
-            ),
-          ),
-          SquareCardCollectionWidget(
-            data,
-            height: 250,
-            showTopView: false,
-            showBottomAvatar: false,
-          )
-        ],
-      ),
-    );
-  }
-
   _fetchDiscoveryList() {
-    HttpController.getInstance().get('v5/index/tab/discovery', (data) {
+    HttpController.getInstance().get(API.DISCOVERY_LIST, (data) {
       List list = data['itemList'];
       _itemList = list;
       _status = LoadingStatus.success;

@@ -13,8 +13,9 @@ class HorizontalScrollCardWidget extends StatelessWidget {
 
   _renderView(BuildContext context) {
     return new Container(
-      height: 180,
-      padding: EdgeInsets.only(top: 10),
+      height: 190,
+      padding: EdgeInsets.only(top: 10,bottom: 10),
+      alignment: Alignment.center,
       child: ListView.builder(
           cacheExtent: 10,
           scrollDirection: Axis.horizontal,
@@ -27,9 +28,11 @@ class HorizontalScrollCardWidget extends StatelessWidget {
   }
 
   _renderSingleImage(BuildContext context, data) {
+    double width =
+        MediaQuery.of(context).size.width - (itemList.length <= 1 ? 30 : 60);
     return new Container(
       height: 180,
-      width: MediaQuery.of(context).size.width - 60,
+      width: width,
       margin: EdgeInsets.only(right: 7),
       child: SingleBannerWidget(data['image'], height: 180),
     );

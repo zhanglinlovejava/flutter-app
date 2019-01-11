@@ -9,7 +9,7 @@ import 'package:flutter_open/component/widgets/TextCardWidget.dart';
 import 'package:flutter_open/component/widgets/SingleBannerWidget.dart';
 import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
-
+import 'package:flutter_open/component/BaseAliveState.dart';
 class CategoryPage extends StatefulWidget {
   @override
   _CategoryPageState createState() => _CategoryPageState();
@@ -18,7 +18,7 @@ class CategoryPage extends StatefulWidget {
   CategoryPage({@required this.categoryId});
 }
 
-class _CategoryPageState extends State<CategoryPage> {
+class _CategoryPageState extends BaseAliveSate<CategoryPage> {
   List _itemList = [];
   LoadingStatus _status = LoadingStatus.loading;
 
@@ -57,6 +57,8 @@ class _CategoryPageState extends State<CategoryPage> {
                     heroTag: data['content']['data']['id'],
                     desc: data['header']['description'],
                     duration: data['content']['data']['duration'],
+                    id: data['content']['data']['author']['id'].toString(),
+                    userType: 'PGC',
                     onCoverTap: () {
                       ActionViewUtils.actionVideoPlayPage(
                           context, data['content']['data']);

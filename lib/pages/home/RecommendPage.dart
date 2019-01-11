@@ -10,12 +10,14 @@ import 'package:flutter_open/component/widgets/SingleBannerWidget.dart';
 import 'package:flutter_open/component/widgets/VideoSmallCardWidget.dart';
 import 'package:flutter_open/component/widgets/SquareCardCollectionWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
+import 'package:flutter_open/component/BaseAliveState.dart';
+import 'package:flutter_open/api/API.dart';
 
 class RecommendPage extends StatefulWidget {
   _RecommendPageState createState() => _RecommendPageState();
 }
 
-class _RecommendPageState extends State<RecommendPage> {
+class _RecommendPageState extends BaseAliveSate<RecommendPage> {
   List _itemList = [];
   LoadingStatus _status = LoadingStatus.loading;
 
@@ -44,7 +46,7 @@ class _RecommendPageState extends State<RecommendPage> {
                 var data = _itemList[index]['data'];
                 if (type == 'textCard') {
                   return TextCardWidget(data);
-                } else if (type == 'banner2') {
+                } else if (type == 'banner2' || type == 'banner') {
                   return new Container(
                     margin: EdgeInsets.only(top: 10),
                     child: SingleBannerWidget(data['image']),
@@ -56,6 +58,8 @@ class _RecommendPageState extends State<RecommendPage> {
                     title: data['header']['title'],
                     heroTag: data['content']['data']['id'],
                     desc: data['header']['description'],
+                    id: data['content']['data']['author']['id'].toString(),
+                    userType: 'PGC',
                     duration: data['content']['data']['duration'],
                     onCoverTap: () {
                       ActionViewUtils.actionVideoPlayPage(
@@ -86,7 +90,7 @@ class _RecommendPageState extends State<RecommendPage> {
   }
 
   _fetchRecommendList() {
-    HttpController.getInstance().get('v5/index/tab/allRec', (data) {
+    HttpController.getInstance().get(API.RECOMMEND_LIST, (data) {
       List list = data['itemList'];
       if (mounted) {
         setState(() {

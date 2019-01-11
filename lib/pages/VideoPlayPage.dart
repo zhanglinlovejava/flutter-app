@@ -5,7 +5,7 @@ import 'package:flutter_open/api/HttpController.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_open/component/widgets/AuthorInfoWidget.dart';
 import 'package:flutter_open/component/widgets/TheEndWidget.dart';
-
+import 'package:flutter_open/api/API.dart';
 class VideoPlayPage extends StatefulWidget {
   final Object item;
 
@@ -86,17 +86,20 @@ class VideoPlayState extends State<VideoPlayPage> {
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          new Text(
-            _itemData['title'],
-            style: TextStyle(
-                fontSize: 16, color: Colors.white, fontFamily: 'FZLanTing'),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
+          Offstage(
+            offstage: _itemData['title'] == '',
+            child: new Text(
+              _itemData['title'],
+              style: TextStyle(
+                  fontSize: 16, color: Colors.white, fontFamily: 'FZLanTing'),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
           ),
           new Padding(
             padding: EdgeInsets.only(top: 8),
             child: new Text(
-              '#${_itemData['category']} / 开眼推荐',
+              '#${_itemData['category'] ?? (_itemData['tags'][0]['name'])} / 开眼推荐',
               style: TextStyle(
                   fontSize: 13, color: Colors.white70, fontFamily: 'FZLanTing'),
               overflow: TextOverflow.ellipsis,
@@ -104,7 +107,7 @@ class VideoPlayState extends State<VideoPlayPage> {
             ),
           ),
           new Padding(
-              padding: EdgeInsets.only(top: 8, bottom: 10),
+              padding: EdgeInsets.only(top: 8, bottom: 15),
               child: new Text(
                 _itemData['description'],
                 style: TextStyle(
@@ -202,17 +205,38 @@ class VideoPlayState extends State<VideoPlayPage> {
               )
             ],
           ),
-          _itemData['author'] == null
-              ? new Container()
-              : new Container(
-                  margin: EdgeInsets.only(top: 10),
-                  child: AuthorInfoWidget(
-                    name: _itemData['author']['name'],
-                    desc: _itemData['author']['description'],
-                    avatar: _itemData['author']['icon'],
-                  ),
-                )
+          renderAuthorInfo()
         ],
+      ),
+    );
+  }
+
+  renderAuthorInfo() {
+    var author = _itemData['author'];
+    var owner = _itemData['owner'];
+    String name, desc, avatar, id, userType;
+    if (author != null) {
+      name = author['name'];
+      desc = author['description'];
+      avatar = author['icon'];
+      id = author['id'].toString();
+      userType = 'PGC';
+    } else {
+      name = owner['nickname'];
+      desc = owner['description'] ?? '';
+      avatar = owner['avatar'];
+      id = owner['uid'].toString();
+      userType = 'NORMAL';
+    }
+    return new Container(
+      margin: EdgeInsets.only(top: 15),
+      child: AuthorInfoWidget(
+        name: name,
+        desc: desc,
+        avatar: avatar,
+        id: id,
+        userType: userType,
+        rightBtnType: 'follow',
       ),
     );
   }
@@ -305,7 +329,7 @@ class VideoPlayState extends State<VideoPlayPage> {
   _getRelatedList() async {
     Map<String, String> params = new Map();
     params['id'] = _itemData['id'].toString();
-    await HttpController.getInstance().get('v4/video/related', (data) {
+    await HttpController.getInstance().get(API.VIDEO_RELATED_LIST, (data) {
       var itemList = data['itemList'];
       itemList.forEach((item) {
         if (item['type'] == 'videoSmallCard') {

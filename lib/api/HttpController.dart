@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'dart:io';
 
 //在 方法参数中，使用'{}' 包围的参数属于可选命名参数，可以为可选参数添加默认值
 class HttpController {
@@ -16,17 +17,21 @@ class HttpController {
 
   HttpController() {
     options = Options(
-        baseUrl: 'http://baobab.kaiyanapp.com/api/',
-        connectTimeout: 10000,
-        receiveTimeout: 10000,
-        headers: {
-          "User-Agent":
-              "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63",
-        },
-        data: {
-          'udid': 'efa9668e70684bdcacc9fa33b6fbc405c3d770a2'
-//          'udid': '2bad2287b35b4303a340cdfba488af4526d1e2ca'
-        });
+      baseUrl: 'http://baobab.kaiyanapp.com/api/',
+      connectTimeout: 10000,
+      receiveTimeout: 10000,
+      headers: {
+        "User-Agent":
+            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63",
+      },
+//        data: {
+//          'udid': 'efa9668e70684bdcacc9fa33b6fbc405c3d770a2',
+////          'udid': '2bad2287b35b4303a340cdfba488af4526d1e2ca',
+//          'vc': 443,
+//          'vn': '4.9.1',
+//          'deviceModel': 'PRO%206%20Plus'
+//        }
+    );
     dio = new Dio(options);
   }
 
@@ -52,22 +57,21 @@ class HttpController {
       {Map<String, String> params,
       Function errorCallback,
       String token}) async {
-    if (params != null && params.isNotEmpty) {
-      StringBuffer sb = new StringBuffer('?');
-      params.forEach((key, value) {
-        sb.write("$key" + "=" + "$value" + "&");
-      });
-      String paramStr = sb.toString();
-      paramStr = paramStr.substring(0, paramStr.length - 1);
-      url += paramStr;
+    if (params == null) {
+      params = new Map();
     }
+    params['udid'] = 'efa9668e70684bdcacc9fa33b6fbc405c3d770a2';
+    params['vc'] = '443';
+    params['vn'] = '4.9.1';
+    params['deviceModel'] = 'PRO%206%20Plus';
     Response response;
     try {
+      print(params);
+      print('------------------> $url');
       response = await dio.get(url,
           data: params, cancelToken: _createCancelToken(token));
       if (callback != null) {
         callback(response.data);
-        print('response:==${response.data}');
       }
     } on DioError catch (e) {
       print('error:===$e');

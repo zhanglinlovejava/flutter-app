@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_open/component/BaseAliveState.dart';
 class NotificationPage extends StatefulWidget {
   @override
   _NotificationPageState createState() {
@@ -7,7 +7,7 @@ class NotificationPage extends StatefulWidget {
   }
 }
 
-class _NotificationPageState extends State<NotificationPage> {
+class _NotificationPageState extends BaseAliveSate<NotificationPage> {
   @override
   Widget build(BuildContext context) {
     return new Center(child: Text("notification"));

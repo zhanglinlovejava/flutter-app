@@ -1,25 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_open/pages/UserInfoPage.dart';
+import 'package:flutter_open/component/widgets/FollowBtnWidget.dart';
 
 class AuthorInfoWidget extends StatelessWidget {
   final String name;
   final String desc;
   final String avatar;
   final bool isDark;
+  final String id;
+  final String userType;
+  final String rightBtnType;
+  final bool showAvatar;
 
-  AuthorInfoWidget({this.name, this.desc, this.avatar, this.isDark = false});
+  AuthorInfoWidget(
+      {this.name = '',
+      this.desc = '',
+      this.avatar,
+      this.isDark = false,
+      this.id,
+      this.userType,
+      this.rightBtnType = 'none',
+      this.showAvatar = true});
 
   @override
   Widget build(BuildContext context) {
     return new Container(
       child: new Row(
         children: <Widget>[
-          new ClipOval(
-            child: new Image.network(
-              avatar,
-              height: 40,
-              width: 40,
-            ),
-          ),
+          showAvatar
+              ? GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (BuildContext context) {
+                      return UserInfoPage(id: id, userType: userType);
+                    }));
+                  },
+                  child: new ClipOval(
+                    child: new Image.network(
+                      avatar,
+                      height: 40,
+                      width: 40,
+                    ),
+                  ),
+                )
+              : new Container(),
           new Expanded(
               child: new Container(
             padding: EdgeInsets.only(left: 5),
@@ -28,53 +52,54 @@ class AuthorInfoWidget extends StatelessWidget {
               children: <Widget>[
                 new Text(
                   name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       color: isDark ? Colors.black : Colors.white,
                       fontSize: 14,
+                      decoration: TextDecoration.none,
                       fontFamily: 'FZLanTing'),
                 ),
-                new Padding(
-                  padding: EdgeInsets.only(top: 5),
-                  child: new Text(
-                    desc,
-                    style: TextStyle(
-                        color: isDark ? Colors.grey : Color(0xffdddddd),
-                        fontSize: 12,
-                        fontFamily: 'FZLanTing'),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                Offstage(
+                  offstage: desc == '',
+                  child: new Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: new Text(
+                      desc,
+                      style: TextStyle(
+                          color: isDark ? Colors.grey : Color(0xffdddddd),
+                          fontSize: 12,
+                          fontFamily: 'FZLanTing'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 )
               ],
             ),
           )),
-          new Container(
-            width: 50,
-            margin: EdgeInsets.only(left: 10),
-            padding: EdgeInsets.all(2),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(3)),
-                border: Border.all(
-                    color: isDark ? Colors.black : Colors.white, width: 0.5)),
-            child: new Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                new Icon(
-                  Icons.add,
-                  size: 15,
-                  color: isDark ? Colors.black : Colors.white,
-                ),
-                new Text(
-                  "关注",
-                  style: TextStyle(
-                      color: isDark ? Colors.black : Colors.white,
-                      fontSize: 11,
-                      fontFamily: 'FZLanTing'),
-                )
-              ],
-            ),
-          )
+          _renderRightBtn()
         ],
+      ),
+    );
+  }
+
+  _renderRightBtn() {
+    if (rightBtnType == 'share') {
+      return _renderShareBtn();
+    } else if (rightBtnType == 'follow') {
+      return FollowBtnWidget(isDark: isDark);
+    } else {
+      return new Container();
+    }
+  }
+
+  _renderShareBtn() {
+    return Container(
+      child: Icon(
+        Icons.share,
+        size: 20,
+        color: isDark ? Colors.grey : Colors.white,
       ),
     );
   }

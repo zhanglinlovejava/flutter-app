@@ -7,12 +7,14 @@ import 'package:flutter_open/component/widgets/FollowCardWidget.dart';
 import 'package:flutter_open/component/widgets/TextCardWidget.dart';
 import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
+import 'package:flutter_open/component/BaseAliveState.dart';
+import 'package:flutter_open/api/API.dart';
 
 class DailyPage extends StatefulWidget {
   _DailyPageState createState() => _DailyPageState();
 }
 
-class _DailyPageState extends State<DailyPage> {
+class _DailyPageState extends BaseAliveSate<DailyPage> {
   List _itemList = [];
   LoadingStatus _status = LoadingStatus.loading;
 
@@ -49,6 +51,8 @@ class _DailyPageState extends State<DailyPage> {
                       heroTag: data['content']['data']['id'],
                       desc: data['header']['description'],
                       duration: data['content']['data']['duration'],
+                      id: data['content']['data']['author']['id'].toString(),
+                      userType: 'PGC',
                       onCoverTap: () {
                         ActionViewUtils.actionVideoPlayPage(
                             context, data['content']['data']);
@@ -61,7 +65,7 @@ class _DailyPageState extends State<DailyPage> {
   }
 
   _fetchFeedList() async {
-    await HttpController.getInstance().get('v5/index/tab/feed', ((data) {
+    await HttpController.getInstance().get(API.DAILY_LIST, ((data) {
       List list = data['itemList'];
       list.removeAt(0);
       if (mounted) {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_open/component/widgets/VideoCardWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
 import 'package:flutter_open/utils/StringUtil.dart';
+import 'package:flutter_open/component/widgets/UgcPictureWidget.dart';
+import 'AuthorInfoWidget.dart';
 
 class AutoPlayFollowCardWidget extends StatefulWidget {
   final data;
@@ -34,79 +36,100 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
           _renderAuthorInfo(),
           _renderDescription(),
           _renderTags(),
-          VideoCardWidget(
-            cover: data['content']['data']['cover']['feed'],
-            duration: data['content']['data']['duration'],
-            id: data['content']['data']['id'],
-            onCoverTap: () {
-              ActionViewUtils.actionVideoPlayPage(
-                  context, data['content']['data']);
-            },
-          ),
+          _renderMiddleCard(),
           _renderBottomBar()
         ],
       ),
     );
   }
 
+  _renderMiddleCard() {
+    String type = data['content']['data']['dataType'];
+    if (type == 'VideoBeanForClient' || type == 'UgcVideoBean') {
+      return VideoCardWidget(
+        cover: data['content']['data']['cover']['feed'],
+        duration: data['content']['data']['duration'],
+        id: data['content']['data']['id'],
+        onCoverTap: () {
+          ActionViewUtils.actionVideoPlayPage(context, data['content']['data']);
+        },
+      );
+    } else if (type == 'UgcPictureBean') {
+      return UgcPictureWidget(data['content']['data']);
+    } else {
+      return new Text(type);
+    }
+  }
+
   _renderTags() {
-    return new Container(
-      height: 25,
-      margin: EdgeInsets.only(bottom: 10),
-      child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: data['content']['data']['tags'].length,
-          itemBuilder: (BuildContext context, int index) {
-            return new Container(
-              margin: EdgeInsets.only(right: 5),
-              padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
-              decoration: BoxDecoration(
-                  color: Color.fromRGBO(80, 135, 200, 0.10),
-                  borderRadius: BorderRadius.all(Radius.circular(3))),
-              child: Text(
-                data['content']['data']['tags'][index]['name'],
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xff5087c8), fontSize: 14),
-              ),
-            );
-          }),
-    );
+    var tags = data['content']['data']['tags'] ?? [];
+    return tags.length == 0
+        ? SizedBox(
+            height: 10,
+          )
+        : new Container(
+            height: 25,
+            margin: EdgeInsets.only(bottom: 10, top: 10),
+            child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: tags.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return new Container(
+                    margin: EdgeInsets.only(right: 5),
+                    padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
+                    decoration: BoxDecoration(
+                        color: Color.fromRGBO(80, 135, 200, 0.10),
+                        borderRadius: BorderRadius.all(Radius.circular(3))),
+                    child: Text(
+                      tags[index]['name'],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Color(0xff5087c8), fontSize: 14),
+                    ),
+                  );
+                }),
+          );
   }
 
   _renderDescription() {
-    return new Container(
-      margin: EdgeInsets.only(top: 5, bottom: 10),
-      child: Stack(
-        children: <Widget>[
-          Text(
-            data['content']['data']['description'],
-            style: TextStyle(fontSize: 15, color: Colors.black54),
-            maxLines: descMaxLines,
-          ),
-          new Positioned(
-              right: 0,
-              bottom: 0,
-              child: Offstage(
-                offstage: descMaxLines > 2,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      descMaxLines = descMaxLines > 2 ? 2 : 20;
-                    });
-                  },
-                  child: new Container(
-                    padding: EdgeInsets.fromLTRB(5, 2, 0, 2),
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(255, 255, 255, 0.8)),
-                    child: Text(
-                      '更多',
-                      style: TextStyle(
-                          color: Color(0xff5087c8), fontFamily: 'FZLanTing'),
+    String desc = data['content']['data']['description'] ?? '';
+    return Offstage(
+      offstage: desc.length == 0,
+      child: new Container(
+        margin: EdgeInsets.only(top: 5),
+        child: Stack(
+          children: <Widget>[
+            Text(
+              desc,
+              style: TextStyle(fontSize: 15, color: Colors.black54),
+              maxLines: descMaxLines,
+            ),
+            new Positioned(
+                right: 0,
+                bottom: 0,
+                child: Offstage(
+                  offstage: descMaxLines > 2 || desc.length < 50,
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        descMaxLines = descMaxLines > 2 ? 2 : 20;
+                      });
+                    },
+                    child: new Container(
+                      padding: EdgeInsets.fromLTRB(5, 2, 0, 2),
+                      decoration: BoxDecoration(
+                          color: Color.fromRGBO(255, 255, 255, 0.8)),
+                      child: Text(
+                        '更多',
+                        style: TextStyle(
+                            color: Color(0xff5087c8),
+                            fontFamily: 'FZLanTing',
+                            fontSize: 13),
+                      ),
                     ),
                   ),
-                ),
-              ))
-        ],
+                ))
+          ],
+        ),
       ),
     );
   }
@@ -138,8 +161,8 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
             children: <Widget>[
               Image(
                 image: AssetImage('asset/images/comment_grey.png'),
-                width: 20,
-                height: 20,
+                width: 18,
+                height: 18,
               ),
               new Padding(
                 padding: EdgeInsets.only(left: 5),
@@ -167,60 +190,28 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
   }
 
   _renderAuthorInfo() {
-    return new Container(
-      child: new Row(
-        children: <Widget>[
-          new Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: ClipOval(
-              child: Image.network(
-                data['content']['data']['author']['icon'],
-                width: 40,
-                height: 40,
-              ),
-            ),
-          ),
-          Expanded(
-            child: new Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                new Padding(
-                  padding: EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    data['content']['data']['author']['name'],
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontFamily: 'FZLanTing',
-                        fontSize: 16),
-                  ),
-                ),
-                new Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
-                    Text(
-                      '发布:',
-                      style: TextStyle(color: Colors.grey),
-                    ),
-                    Expanded(
-                        child: new Padding(
-                      padding: EdgeInsets.only(left: 5),
-                      child: Text(
-                        data['content']['data']['title'],
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.black,
-                            fontFamily: 'FZLanTing'),
-                      ),
-                    ))
-                  ],
-                )
-              ],
-            ),
-          )
-        ],
-      ),
+    var author = data['content']['data']['author'];
+    var owner = data['content']['data']['owner'];
+    String icon, name, id, userType;
+    if (author == null) {
+      icon = owner['avatar'];
+      name = owner['nickname'];
+      id = owner['uid'].toString();
+      userType = owner['userType'];
+    } else {
+      icon = author['icon'];
+      name = author['name'];
+      id = author['id'].toString();
+      userType = 'PGC';
+    }
+    return AuthorInfoWidget(
+      name: name,
+      avatar: icon,
+      desc: '发布:',
+      isDark: true,
+      rightBtnType: 'share',
+      id: id,
+      userType: userType,
     );
   }
 }

@@ -76,6 +76,8 @@ class SquareCardCollectionWidget extends StatelessWidget {
 
   _renderBottomView(BuildContext context) {
     var childList = data['itemList'];
+    double width =
+        MediaQuery.of(context).size.width - (childList.length <= 1 ? 30 : 60);
     return new Container(
       padding: EdgeInsets.only(top: 5),
       child: ListView.builder(
@@ -87,7 +89,7 @@ class SquareCardCollectionWidget extends StatelessWidget {
             var type = childList[index]['type'];
             if (type == 'followCard') {
               return new Container(
-                width: MediaQuery.of(context).size.width - 60,
+                width: width,
                 margin: EdgeInsets.only(right: 7),
                 child: FollowCardWidget(
                   cover: item['content']['data']['cover']['feed'],
@@ -96,16 +98,18 @@ class SquareCardCollectionWidget extends StatelessWidget {
                   heroTag: item['content']['data']['id'],
                   desc: item['header']['description'],
                   duration: item['content']['data']['duration'],
+                  id: item['content']['data']['author']['id'].toString(),
+                  userType: 'PGC',
                   onCoverTap: () {
                     ActionViewUtils.actionVideoPlayPage(
                         context, item['content']['data']);
                   },
                 ),
               );
-            } else if (type == 'banner2') {
+            } else if (type == 'banner2' || type == 'banner') {
               return new Container(
-                width: MediaQuery.of(context).size.width - 60,
-                margin: EdgeInsets.only(right: 7),
+                width: width,
+                margin: EdgeInsets.only(right: 7, top: 5, bottom: 10),
                 child: SingleBannerWidget(
                   item['image'],
                   height: height,
@@ -113,7 +117,7 @@ class SquareCardCollectionWidget extends StatelessWidget {
               );
             } else if (type == 'video') {
               return new Container(
-                width: MediaQuery.of(context).size.width - 60,
+                width: width,
                 margin: EdgeInsets.only(right: 7),
                 child: FollowCardWidget(
                     cover: item['cover']['feed'],
@@ -122,10 +126,11 @@ class SquareCardCollectionWidget extends StatelessWidget {
                     heroTag: item['id'],
                     desc: item['description'],
                     duration: item['duration'],
+                    id: item['author']['id'].toString(),
+                    userType: 'PGC',
                     showBottomAvatar: false,
                     onCoverTap: () {
-                      ActionViewUtils.actionVideoPlayPage(
-                          context, item);
+                      ActionViewUtils.actionVideoPlayPage(context, item);
                     }),
               );
             }
