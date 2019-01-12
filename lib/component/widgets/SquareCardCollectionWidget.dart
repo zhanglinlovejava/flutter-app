@@ -89,20 +89,27 @@ class SquareCardCollectionWidget extends StatelessWidget {
             var item = childList[index]['data'];
             var type = childList[index]['type'];
             if (type == 'followCard') {
+              var _data = item['content']['data'];
               return new Container(
                 width: width,
                 margin: EdgeInsets.only(right: 10),
                 child: FollowCardWidget(
-                  cover: item['content']['data']['cover']['feed'],
+                  cover: _data['cover']['feed'],
                   avatar: item['header']['icon'],
                   title: item['header']['title'],
                   desc: item['header']['description'],
-                  duration: item['content']['data']['duration'],
-                  id: item['content']['data']['author']['id'].toString(),
+                  duration: _data['duration'],
+                  id: _data['author']['id'].toString(),
                   userType: 'PGC',
                   onCoverTap: () {
-                    ActionViewUtils.actionVideoPlayPage(
-                        context, item['content']['data']);
+                    ActionViewUtils.actionVideoPlayPage(context,
+                        desc: _data['description'],
+                        id: _data['id'],
+                        category: _data['category'],
+                        author: _data['author'],
+                        cover: _data['cover'],
+                        consumption: _data['consumption'],
+                        title: _data['title']);
                   },
                 ),
               );
@@ -129,7 +136,14 @@ class SquareCardCollectionWidget extends StatelessWidget {
                     userType: 'PGC',
                     showBottomAvatar: false,
                     onCoverTap: () {
-                      ActionViewUtils.actionVideoPlayPage(context, item);
+                      ActionViewUtils.actionVideoPlayPage(context,
+                          desc: item['description'],
+                          id: item['id'],
+                          category: item['category'],
+                          author: item['author'],
+                          cover: item['cover'],
+                          consumption: item['consumption'],
+                          title: item['title']);
                     }),
               );
             } else if (type == 'squareCardOfCategory') {

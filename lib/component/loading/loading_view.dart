@@ -8,6 +8,7 @@ class LoadingView extends StatefulWidget {
   static const loadingContentKey = ValueKey('loading');
   static const errorContentKey = ValueKey('error');
   static const successContentKey = ValueKey('success');
+  static const emptyContentKey = ValueKey('empty');
 
   static const successContentAnimationDuration = Duration(milliseconds: 400);
 
@@ -16,12 +17,14 @@ class LoadingView extends StatefulWidget {
     @required this.loadingContent,
     @required this.errorContent,
     @required this.successContent,
+    @required this.emptyContent,
   });
 
   final LoadingStatus status;
   final Widget loadingContent;
   final Widget errorContent;
   final Widget successContent;
+  final Widget emptyContent;
 
   @override
   LoadingViewState createState() => LoadingViewState();
@@ -32,10 +35,15 @@ class LoadingViewState extends State<LoadingView>
   AnimationController _loadingController;
   AnimationController _errorController;
   AnimationController _successController;
+  AnimationController _emptyController;
 
   bool get loadingContentVisible => _loadingController.value == 1.0;
+
   bool get errorContentVisible => _errorController.value == 1.0;
+
   bool get successContentVisible => _successController.value == 1.0;
+
+  bool get emptyContentVisible => _emptyController.value == 1.0;
 
   Widget firstChild;
   Widget secondChild;
@@ -59,7 +67,10 @@ class LoadingViewState extends State<LoadingView>
       duration: LoadingView.successContentAnimationDuration,
       vsync: this,
     );
-
+    _emptyController = AnimationController(
+      duration: const Duration(milliseconds: 350),
+      vsync: this,
+    );
     switch (widget.status) {
       case LoadingStatus.idle:
       case LoadingStatus.loading:
@@ -71,6 +82,9 @@ class LoadingViewState extends State<LoadingView>
       case LoadingStatus.success:
         _animationStack.add(_successController.forward);
         break;
+      case LoadingStatus.empty:
+        _animationStack.add(_emptyController.forward);
+        break;
     }
 
     _playAnimations();
@@ -81,6 +95,7 @@ class LoadingViewState extends State<LoadingView>
     _loadingController.dispose();
     _errorController.dispose();
     _successController.dispose();
+    _emptyController.dispose();
     super.dispose();
   }
 
@@ -102,6 +117,9 @@ class LoadingViewState extends State<LoadingView>
         case LoadingStatus.success:
           reverseAnimation = _successController.reverse;
           break;
+        case LoadingStatus.empty:
+          reverseAnimation = _emptyController.reverse;
+          break;
       }
 
       _animationStack.add(reverseAnimation);
@@ -116,6 +134,9 @@ class LoadingViewState extends State<LoadingView>
           break;
         case LoadingStatus.success:
           _animationStack.add(_successController.forward);
+          break;
+        case LoadingStatus.empty:
+          _animationStack.add(_emptyController.forward);
           break;
       }
 
@@ -145,6 +166,12 @@ class LoadingViewState extends State<LoadingView>
           controller: _successController,
           child: widget.successContent,
           isVisible: widget.status == LoadingStatus.success,
+        ),
+        _TransitionAnimation(
+          key: LoadingView.emptyContentKey,
+          controller: _emptyController,
+          child: widget.emptyContent,
+          isVisible: widget.status == LoadingStatus.empty,
         ),
       ],
     );

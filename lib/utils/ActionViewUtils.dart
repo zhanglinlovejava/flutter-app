@@ -3,9 +3,26 @@ import 'package:flutter_open/pages/VideoPlayPage.dart';
 import 'package:flutter_open/utils/StringUtil.dart';
 
 class ActionViewUtils {
-  static actionVideoPlayPage(BuildContext context, data) {
+  static actionVideoPlayPage(BuildContext context,
+      {var consumption,
+      var author,
+      var cover,
+      String title,
+      String category,
+      String playUrl,
+      String desc,
+      int id}) {
     Navigator.of(context).push(new MaterialPageRoute(builder: (_) {
-      return new VideoPlayPage(data);
+      return new VideoPlayPage(
+        category: category,
+        consumption: consumption,
+        author: author,
+        cover: cover,
+        id: id.toString(),
+        title: title,
+        playUrl: playUrl,
+        desc: desc,
+      );
     }));
   }
 
@@ -20,7 +37,8 @@ class ActionViewUtils {
 
   static renderBorderBottom() {
     return BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[200], width: 0.5)));
+        border:
+            Border(bottom: BorderSide(color: Colors.grey[200], width: 0.5)));
   }
 
   static buildDuration(int duration) {

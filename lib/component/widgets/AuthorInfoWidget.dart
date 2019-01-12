@@ -11,6 +11,7 @@ class AuthorInfoWidget extends StatelessWidget {
   final String userType;
   final String rightBtnType;
   final bool showAvatar;
+  final bool showCircleAvatar;
 
   AuthorInfoWidget(
       {this.name = '',
@@ -19,6 +20,7 @@ class AuthorInfoWidget extends StatelessWidget {
       this.isDark = false,
       this.id,
       this.userType,
+      this.showCircleAvatar = true,
       this.rightBtnType = 'none',
       this.showAvatar = true});
 
@@ -35,13 +37,19 @@ class AuthorInfoWidget extends StatelessWidget {
                       return UserInfoPage(id: id, userType: userType);
                     }));
                   },
-                  child: new ClipOval(
-                    child: new Image.network(
-                      avatar,
-                      height: 40,
-                      width: 40,
-                    ),
-                  ),
+                  child: showCircleAvatar
+                      ? new ClipOval(
+                          child: new Image.network(
+                            avatar,
+                            height: 40,
+                            width: 40,
+                          ),
+                        )
+                      : new Image.network(
+                          avatar,
+                          height: 40,
+                          width: 40,
+                        ),
                 )
               : new Container(),
           new Expanded(
@@ -60,21 +68,20 @@ class AuthorInfoWidget extends StatelessWidget {
                       decoration: TextDecoration.none,
                       fontFamily: 'FZLanTing'),
                 ),
-                Offstage(
-                  offstage: desc == '',
-                  child: new Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: new Text(
-                      desc,
-                      style: TextStyle(
-                          color: isDark ? Colors.grey : Color(0xffdddddd),
-                          fontSize: 12,
-                          fontFamily: 'FZLanTing'),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                )
+                desc == '' || desc == null
+                    ? new Container()
+                    : new Padding(
+                        padding: EdgeInsets.only(top: 5),
+                        child: new Text(
+                          desc,
+                          style: TextStyle(
+                              color: isDark ? Colors.grey : Color(0xffdddddd),
+                              fontSize: 12,
+                              fontFamily: 'FZLanTing'),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
               ],
             ),
           )),
@@ -89,6 +96,14 @@ class AuthorInfoWidget extends StatelessWidget {
       return _renderShareBtn();
     } else if (rightBtnType == 'follow') {
       return FollowBtnWidget(isDark: isDark);
+    } else if (rightBtnType == 'arrow') {
+      return Container(
+        child: Image.asset(
+          'asset/images/arrow_right.png',
+          width: 15,
+          height: 20,
+        ),
+      );
     } else {
       return new Container();
     }

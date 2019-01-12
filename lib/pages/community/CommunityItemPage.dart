@@ -4,6 +4,7 @@ import 'package:flutter_open/component/loading/loading_view.dart';
 import 'package:flutter_open/component/loading/LoadingStatus.dart';
 import 'package:flutter_open/component/loading/platform_adaptive_progress_indicator.dart';
 import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
+import 'package:flutter_open/component/widgets/LoadEmptyWidget.dart';
 import 'package:flutter_open/component/BaseAliveState.dart';
 import 'package:flutter_open/component/widgets/SquareCardCollectionWidget.dart';
 import 'package:flutter_open/component/widgets/AutoPlayFollowCardWidget.dart';
@@ -37,18 +38,18 @@ class _CommunityItemPageState extends BaseAliveSate<CommunityItemPage> {
   @override
   Widget build(BuildContext context) {
     return new Container(
+        color: Colors.white,
         padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
         child: new LoadingView(
           status: _status,
           loadingContent: const PlatformAdaptiveProgressIndicator(),
-          errorContent: LoadErrorWidget(
-              onRetryFunc: () {
-                setState(() {
-                  _status = LoadingStatus.loading;
-                });
-                _fetchCommunityList();
-              },
-              errMsg: _errMsg ?? '出错了'),
+          emptyContent: LoadEmptyWidget(onRetryFunc: () {
+            setState(() {
+              _status = LoadingStatus.loading;
+            });
+            _fetchCommunityList();
+          }),
+          errorContent: _renderErrorOrEmpty(),
           successContent: new ListView.builder(
               itemCount: _itemList.length,
               itemBuilder: (BuildContext context, int index) {
@@ -59,6 +60,11 @@ class _CommunityItemPageState extends BaseAliveSate<CommunityItemPage> {
                   return SquareCardCollectionWidget(
                     data,
                     height: 220,
+                  );
+                } else if (type == 'videoCollectionOfHorizontalScrollCard') {
+                  return SquareCardCollectionWidget(
+                    data,
+                    height: 280,
                   );
                 }
                 if (type == 'pictureFollowCard') {
@@ -71,7 +77,14 @@ class _CommunityItemPageState extends BaseAliveSate<CommunityItemPage> {
                     duration: data['duration'],
                     category: data['category'],
                     onCoverTap: () {
-                      ActionViewUtils.actionVideoPlayPage(context, data);
+                      ActionViewUtils.actionVideoPlayPage(context,
+                          desc: data['description'],
+                          id: data['id'],
+                          category: data['category'],
+                          author: data['author'],
+                          cover: data['cover'],
+                          consumption: data['consumption'],
+                          title: data['title']);
                     },
                   );
                 }
@@ -86,11 +99,9 @@ class _CommunityItemPageState extends BaseAliveSate<CommunityItemPage> {
                 } else if (type == 'briefCard') {
                   return BriefCardWidget(
                       icon: data['icon'], title: data['title']);
-                }
-//                else if (type == 'DynamicInfoCard') {
-//                  return DynamicInfoCardWidget(data);
-//                }
-                else {
+                } else if (type == 'DynamicInfoCard') {
+                  return DynamicInfoCardWidget(data);
+                } else {
                   return new Text(
                     type,
                     style: TextStyle(color: Colors.green),
@@ -100,11 +111,23 @@ class _CommunityItemPageState extends BaseAliveSate<CommunityItemPage> {
         ));
   }
 
+  _renderErrorOrEmpty() {
+    return LoadErrorWidget(
+        onRetryFunc: () {
+          setState(() {
+            _status = LoadingStatus.loading;
+          });
+          _fetchCommunityList();
+        },
+        errMsg: _errMsg ?? '出错了');
+  }
+
   _fetchCommunityList() {
     HttpController.getInstance().get(widget.url, (data) {
       print(widget.url);
       _itemList = data['itemList'];
-      _status = LoadingStatus.success;
+      _status =
+          _itemList.length == 0 ? LoadingStatus.empty : LoadingStatus.success;
       if (mounted) {
         setState(() {});
       }

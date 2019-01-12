@@ -24,7 +24,7 @@ class UserInfoPage extends StatefulWidget {
 
 class _UserInfoPageState extends State<UserInfoPage>
     with SingleTickerProviderStateMixin {
-  double expandedHeight = 334;
+  double expandedHeight;
   LoadingStatus _status = LoadingStatus.loading;
   ScrollController scrollController = ScrollController();
   double scrollMaxHeight = 0;
@@ -37,7 +37,7 @@ class _UserInfoPageState extends State<UserInfoPage>
   @override
   void initState() {
     super.initState();
-    expandedHeight = Platform.isIOS ? 354 : 334;
+    expandedHeight = Platform.isIOS ? 356 : 336;
     scrollController.addListener(() {
       opacity = scrollController.offset / scrollMaxHeight;
       titleColor = opacity > 0.6 ? titleColor = Colors.black : Colors.white;
@@ -253,7 +253,7 @@ class _UserInfoPageState extends State<UserInfoPage>
 
   _renderAuthorInfo() {
     return Container(
-      height: 65,
+      height: 66,
       child: Row(
         children: <Widget>[
           Container(

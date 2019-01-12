@@ -51,23 +51,31 @@ class _CategoryPageState extends BaseAliveSate<CategoryPage> {
                 } else if (type == 'banner2' || type == 'banner') {
                   return SingleBannerWidget(data['image']);
                 } else if (type == 'followCard') {
+                  var _data = data['content']['data'];
                   return Container(
                     child: FollowCardWidget(
-                      cover: data['content']['data']['cover']['feed'],
+                      cover: _data['cover']['feed'],
                       avatar: data['header']['icon'],
                       title: data['header']['title'],
                       desc: data['header']['description'],
-                      duration: data['content']['data']['duration'],
-                      id: data['content']['data']['author']['id'].toString(),
+                      duration: _data['duration'],
+                      id: _data['author']['id'].toString(),
                       userType: 'PGC',
                       onCoverTap: () {
-                        ActionViewUtils.actionVideoPlayPage(
-                            context, data['content']['data']);
+                        ActionViewUtils.actionVideoPlayPage(context,
+                            desc: _data['description'],
+                            id: _data['id'],
+                            category: _data['category'],
+                            author: _data['author'],
+                            cover: _data['cover'],
+                            consumption: _data['consumption'],
+                            title: _data['title']);
                       },
                     ),
                     margin: EdgeInsets.only(bottom: 10),
                   );
                 } else if (type == 'videoSmallCard') {
+                  var _data = data['content']['data'];
                   return VideoSmallCardWidget(
                     id: data['id'],
                     cover: data['cover']['feed'],
@@ -75,7 +83,14 @@ class _CategoryPageState extends BaseAliveSate<CategoryPage> {
                     duration: data['duration'],
                     category: data['category'],
                     onCoverTap: () {
-                      ActionViewUtils.actionVideoPlayPage(context, data);
+                      ActionViewUtils.actionVideoPlayPage(context,
+                          desc: _data['description'],
+                          id: _data['id'],
+                          category: _data['category'],
+                          author: _data['author'],
+                          cover: _data['cover'],
+                          consumption: _data['consumption'],
+                          title: _data['title']);
                     },
                   );
                 } else {

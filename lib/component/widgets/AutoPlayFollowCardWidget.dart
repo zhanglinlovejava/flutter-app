@@ -46,14 +46,22 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
   }
 
   _renderMiddleCard() {
-    String type = data['content']['data']['dataType'];
+    var _data = data['content']['data'];
+    String type = _data['dataType'];
     if (type == 'VideoBeanForClient' || type == 'UgcVideoBean') {
       return VideoCardWidget(
-        cover: data['content']['data']['cover']['feed'],
-        duration: data['content']['data']['duration'],
-        id: data['content']['data']['id'],
+        cover: _data['cover']['feed'],
+        duration: _data['duration'],
+        id: _data['id'],
         onCoverTap: () {
-          ActionViewUtils.actionVideoPlayPage(context, data['content']['data']);
+          ActionViewUtils.actionVideoPlayPage(context,
+              desc: _data['description'],
+              id: _data['id'],
+              category: _data['category'],
+              author: _data['author']??_data['owner'],
+              cover: _data['cover'],
+              consumption: _data['consumption'],
+              title: _data['title']);
         },
       );
     } else if (type == 'UgcPictureBean') {

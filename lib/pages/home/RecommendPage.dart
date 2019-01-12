@@ -52,17 +52,24 @@ class _RecommendPageState extends BaseAliveSate<RecommendPage> {
                     child: SingleBannerWidget(data['image']),
                   );
                 } else if (type == 'followCard') {
+                  var _data = data['content']['data'];
                   return FollowCardWidget(
-                    cover: data['content']['data']['cover']['feed'],
+                    cover: _data['cover']['feed'],
                     avatar: data['header']['icon'],
                     title: data['header']['title'],
                     desc: data['header']['description'],
-                    id: data['content']['data']['author']['id'].toString(),
+                    id: _data['author']['id'].toString(),
                     userType: 'PGC',
-                    duration: data['content']['data']['duration'],
+                    duration: _data['duration'],
                     onCoverTap: () {
-                      ActionViewUtils.actionVideoPlayPage(
-                          context, data['content']['data']);
+                      ActionViewUtils.actionVideoPlayPage(context,
+                          desc: _data['description'],
+                          id: _data['id'],
+                          category: _data['category'],
+                          author: _data['author'],
+                          cover: _data['cover'],
+                          consumption: _data['consumption'],
+                          title: _data['title']);
                     },
                   );
                 } else if (type == 'videoSmallCard') {
@@ -73,7 +80,14 @@ class _RecommendPageState extends BaseAliveSate<RecommendPage> {
                     duration: data['duration'],
                     category: data['category'],
                     onCoverTap: () {
-                      ActionViewUtils.actionVideoPlayPage(context, data);
+                      ActionViewUtils.actionVideoPlayPage(context,
+                          desc: data['description'],
+                          id: data['id'],
+                          category: data['category'],
+                          author: data['author'],
+                          cover: data['cover'],
+                          consumption: data['consumption'],
+                          title: data['title']);
                     },
                   );
                 } else if (type == 'squareCardCollection') {

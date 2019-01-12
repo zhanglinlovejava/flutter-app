@@ -44,22 +44,28 @@ class _DailyPageState extends BaseAliveSate<DailyPage> {
                 if (type == 'textCard') {
                   return TextCardWidget(data);
                 } else if (type == 'followCard') {
-                  return
-                    Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      child: FollowCardWidget(
-                        cover: data['content']['data']['cover']['feed'],
+                  var _data = data['content']['data'];
+                  return Container(
+                    margin: EdgeInsets.only(bottom: 10),
+                    child: FollowCardWidget(
+                        cover: _data['cover']['feed'],
                         avatar: data['header']['icon'],
                         title: data['header']['title'],
                         desc: data['header']['description'],
-                        duration: data['content']['data']['duration'],
-                        id: data['content']['data']['author']['id'].toString(),
+                        duration: _data['duration'],
+                        id: _data['author']['id'].toString(),
                         userType: 'PGC',
                         onCoverTap: () {
-                          ActionViewUtils.actionVideoPlayPage(
-                              context, data['content']['data']);
-                        }) ,)
-                   ;
+                          ActionViewUtils.actionVideoPlayPage(context,
+                              desc: _data['description'],
+                              id: _data['id'],
+                              category: _data['category'],
+                              author: _data['author'],
+                              cover: _data['cover'],
+                              consumption: _data['consumption'],
+                              title: _data['title']);
+                        }),
+                  );
                 } else {
                   return Text(type);
                 }
