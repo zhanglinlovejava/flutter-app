@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open/component/widgets/SingleBannerWidget.dart';
-
 class HorizontalScrollCardWidget extends StatelessWidget {
   final List itemList;
 
@@ -14,7 +13,7 @@ class HorizontalScrollCardWidget extends StatelessWidget {
   _renderView(BuildContext context) {
     return new Container(
       height: 190,
-      padding: EdgeInsets.only(top: 10,bottom: 10),
+      padding: EdgeInsets.only(bottom: 10),
       alignment: Alignment.center,
       child: ListView.builder(
           cacheExtent: 10,
@@ -33,7 +32,7 @@ class HorizontalScrollCardWidget extends StatelessWidget {
     return new Container(
       height: 180,
       width: width,
-      margin: EdgeInsets.only(right: 7),
+      margin: EdgeInsets.only(right: 10),
       child: SingleBannerWidget(data['image'], height: 180),
     );
   }

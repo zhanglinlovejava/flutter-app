@@ -80,7 +80,6 @@ class _DiscoveryPageState extends BaseAliveSate<DiscoveryPage> {
                     cover: data['content']['data']['cover']['feed'],
                     avatar: data['header']['icon'],
                     title: data['header']['title'],
-                    heroTag: data['content']['data']['id'],
                     desc: data['header']['description'],
                     duration: data['content']['data']['duration'],
                     id: data['content']['data']['author']['id'].toString(),
@@ -93,7 +92,6 @@ class _DiscoveryPageState extends BaseAliveSate<DiscoveryPage> {
                 } else if (type == 'squareCardCollection') {
                   return SquareCardCollectionWidget(
                     data,
-                    height: 190,
                   );
                 } else if (type == 'horizontalScrollCard') {
                   return HorizontalScrollCardWidget(itemList: data['itemList']);

@@ -40,14 +40,12 @@ class VideoSmallCardWidget extends StatelessWidget {
                     ], 5),
                     child: new ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(3)),
-                        child: new Hero(
-                            tag: id,
-                            child: new Image.network(
+                        child:  new Image.network(
                               cover,
                               width: 160,
                               height: double.infinity,
                               fit: BoxFit.cover,
-                            ))),
+                            )),
                   ),
                   ActionViewUtils.buildDuration(duration)
                 ],

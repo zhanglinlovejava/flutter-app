@@ -8,9 +8,9 @@ import 'package:flutter_open/pages/community/CommunityItemPage.dart';
 import 'package:flutter_open/component/widgets/FollowBtnWidget.dart';
 import 'package:flutter_open/entity/TabList.dart';
 import 'package:flutter_open/api/API.dart';
+import 'dart:io';
 
 const double tabBarHeight = 40;
-const double expandedHeight = 334;
 
 class UserInfoPage extends StatefulWidget {
   final String id;
@@ -24,6 +24,7 @@ class UserInfoPage extends StatefulWidget {
 
 class _UserInfoPageState extends State<UserInfoPage>
     with SingleTickerProviderStateMixin {
+  double expandedHeight = 334;
   LoadingStatus _status = LoadingStatus.loading;
   ScrollController scrollController = ScrollController();
   double scrollMaxHeight = 0;
@@ -36,6 +37,7 @@ class _UserInfoPageState extends State<UserInfoPage>
   @override
   void initState() {
     super.initState();
+    expandedHeight = Platform.isIOS ? 354 : 334;
     scrollController.addListener(() {
       opacity = scrollController.offset / scrollMaxHeight;
       titleColor = opacity > 0.6 ? titleColor = Colors.black : Colors.white;
@@ -91,12 +93,17 @@ class _UserInfoPageState extends State<UserInfoPage>
                 fontSize: 16),
             textAlign: TextAlign.left,
           ),
-          leading: new Container(
-            padding: EdgeInsets.all(15),
-            child: Icon(
-              Icons.arrow_back_ios,
-              size: 20,
-              color: titleColor,
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: new Container(
+              padding: EdgeInsets.all(15),
+              child: Icon(
+                Icons.arrow_back_ios,
+                size: 20,
+                color: titleColor,
+              ),
             ),
           ),
           pinned: true,
@@ -246,7 +253,7 @@ class _UserInfoPageState extends State<UserInfoPage>
 
   _renderAuthorInfo() {
     return Container(
-      height: 64,
+      height: 65,
       child: Row(
         children: <Widget>[
           Container(
@@ -323,9 +330,9 @@ class _UserInfoPageState extends State<UserInfoPage>
       } else if (widget.userType == 'NORMAL') {
         _userInfo = data['userInfo'];
       }
-      if (tabInfo == null || tabInfo['tabList'] == null) {
+      if (tabInfo == null || tabInfo['tabList'] == null || _userInfo == null) {
         _status = LoadingStatus.error;
-        _errMsg = data['errorMessage'];
+        _errMsg = data['errorMessage'] ?? '加载出错了~';
       } else {
         tabList = TabList.map(tabInfo['tabList']);
         _status = LoadingStatus.success;

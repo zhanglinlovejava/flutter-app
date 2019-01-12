@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_open/component/widgets/FollowCardWidget.dart';
 import 'package:flutter_open/component/widgets/SingleBannerWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
+import 'BriefCardWidget.dart';
 
 class SquareCardCollectionWidget extends StatelessWidget {
   final data;
@@ -90,12 +91,11 @@ class SquareCardCollectionWidget extends StatelessWidget {
             if (type == 'followCard') {
               return new Container(
                 width: width,
-                margin: EdgeInsets.only(right: 7),
+                margin: EdgeInsets.only(right: 10),
                 child: FollowCardWidget(
                   cover: item['content']['data']['cover']['feed'],
                   avatar: item['header']['icon'],
                   title: item['header']['title'],
-                  heroTag: item['content']['data']['id'],
                   desc: item['header']['description'],
                   duration: item['content']['data']['duration'],
                   id: item['content']['data']['author']['id'].toString(),
@@ -109,7 +109,7 @@ class SquareCardCollectionWidget extends StatelessWidget {
             } else if (type == 'banner2' || type == 'banner') {
               return new Container(
                 width: width,
-                margin: EdgeInsets.only(right: 7, top: 5, bottom: 10),
+                margin: EdgeInsets.only(right: 10, top: 5),
                 child: SingleBannerWidget(
                   item['image'],
                   height: height,
@@ -118,12 +118,11 @@ class SquareCardCollectionWidget extends StatelessWidget {
             } else if (type == 'video') {
               return new Container(
                 width: width,
-                margin: EdgeInsets.only(right: 7),
+                margin: EdgeInsets.only(right: 10),
                 child: FollowCardWidget(
                     cover: item['cover']['feed'],
                     avatar: item['author']['icon'],
                     title: item['title'],
-                    heroTag: item['id'],
                     desc: item['description'],
                     duration: item['duration'],
                     id: item['author']['id'].toString(),
@@ -133,6 +132,15 @@ class SquareCardCollectionWidget extends StatelessWidget {
                       ActionViewUtils.actionVideoPlayPage(context, item);
                     }),
               );
+            } else if (type == 'squareCardOfCategory') {
+              return Container(
+                  width: 150,
+                  height: double.infinity,
+                  margin: EdgeInsets.only(right: 10),
+                  child: BriefCardWidget(
+                      icon: item['image'], title: item['title']));
+            } else {
+              return Text(type + "----");
             }
           }),
     );

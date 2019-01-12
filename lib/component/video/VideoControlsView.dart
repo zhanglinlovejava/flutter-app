@@ -164,12 +164,12 @@ class _VideoControlsViewState extends State<VideoControlsView> {
 
   _buildNormalTopView() {
     return new Positioned(
-        top: 10,
+        top: 20,
         left: 10,
         child: new GestureDetector(
           onTap: _onCloseTap,
           child: new Container(
-            padding: EdgeInsets.all(3),
+            padding: EdgeInsets.all(5),
             decoration: BoxDecoration(
                 color: Color.fromRGBO(0, 0, 0, 0.5),
                 borderRadius: BorderRadius.all(Radius.circular(25))),

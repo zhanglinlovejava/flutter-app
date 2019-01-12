@@ -10,6 +10,7 @@ import 'package:flutter_open/component/widgets/SingleBannerWidget.dart';
 import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
 import 'package:flutter_open/component/BaseAliveState.dart';
+
 class CategoryPage extends StatefulWidget {
   @override
   _CategoryPageState createState() => _CategoryPageState();
@@ -47,22 +48,24 @@ class _CategoryPageState extends BaseAliveSate<CategoryPage> {
                 var data = _itemList[index]['data'];
                 if (type == 'textCard') {
                   return TextCardWidget(data);
-                } else if (type == 'banner2') {
+                } else if (type == 'banner2' || type == 'banner') {
                   return SingleBannerWidget(data['image']);
                 } else if (type == 'followCard') {
-                  return FollowCardWidget(
-                    cover: data['content']['data']['cover']['feed'],
-                    avatar: data['header']['icon'],
-                    title: data['header']['title'],
-                    heroTag: data['content']['data']['id'],
-                    desc: data['header']['description'],
-                    duration: data['content']['data']['duration'],
-                    id: data['content']['data']['author']['id'].toString(),
-                    userType: 'PGC',
-                    onCoverTap: () {
-                      ActionViewUtils.actionVideoPlayPage(
-                          context, data['content']['data']);
-                    },
+                  return Container(
+                    child: FollowCardWidget(
+                      cover: data['content']['data']['cover']['feed'],
+                      avatar: data['header']['icon'],
+                      title: data['header']['title'],
+                      desc: data['header']['description'],
+                      duration: data['content']['data']['duration'],
+                      id: data['content']['data']['author']['id'].toString(),
+                      userType: 'PGC',
+                      onCoverTap: () {
+                        ActionViewUtils.actionVideoPlayPage(
+                            context, data['content']['data']);
+                      },
+                    ),
+                    margin: EdgeInsets.only(bottom: 10),
                   );
                 } else if (type == 'videoSmallCard') {
                   return VideoSmallCardWidget(

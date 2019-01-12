@@ -29,7 +29,9 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
   @override
   Widget build(BuildContext context) {
     return new Container(
+      decoration: ActionViewUtils.renderBorderBottom(),
       margin: EdgeInsets.only(bottom: 20),
+      padding: EdgeInsets.only(bottom: 10),
       child: new Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -209,7 +211,7 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
       avatar: icon,
       desc: '发布:',
       isDark: true,
-      rightBtnType: 'share',
+      rightBtnType: 'none',
       id: id,
       userType: userType,
     );

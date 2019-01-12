@@ -56,7 +56,6 @@ class _RecommendPageState extends BaseAliveSate<RecommendPage> {
                     cover: data['content']['data']['cover']['feed'],
                     avatar: data['header']['icon'],
                     title: data['header']['title'],
-                    heroTag: data['content']['data']['id'],
                     desc: data['header']['description'],
                     id: data['content']['data']['author']['id'].toString(),
                     userType: 'PGC',

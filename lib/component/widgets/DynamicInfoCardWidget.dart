@@ -11,7 +11,11 @@ class DynamicInfoCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Container(
-      margin: EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+          border:
+              Border(bottom: BorderSide(color: Colors.grey[200], width: 1))),
+      margin: EdgeInsets.only(bottom: 20),
+      padding: EdgeInsets.only(bottom: 10),
       child: new Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

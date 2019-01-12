@@ -6,6 +6,8 @@ import 'package:video_player/video_player.dart';
 import 'package:flutter_open/component/widgets/AuthorInfoWidget.dart';
 import 'package:flutter_open/component/widgets/TheEndWidget.dart';
 import 'package:flutter_open/api/API.dart';
+import 'dart:io';
+
 class VideoPlayPage extends StatefulWidget {
   final Object item;
 
@@ -20,13 +22,11 @@ class VideoPlayState extends State<VideoPlayPage> {
   List _itemList = new List();
   VideoPlayerController _controller;
   ScrollController _scrollController = ScrollController();
-  var _tag;
 
   @override
   void initState() {
     super.initState();
     _itemData = widget.item;
-    _tag = _itemData['id'];
     _controller = VideoPlayerController.network(_itemData['playUrl']);
     _getRelatedList();
   }
@@ -42,7 +42,7 @@ class VideoPlayState extends State<VideoPlayPage> {
                   image: NetworkImage(_itemData['cover']['blurred'] ??
                       'http://img.kaiyanapp.com/cb916f79b1cfe542c2e58eaf00e84232.jpeg?imageMogr2/quality/60/format/jpg'),
                   fit: BoxFit.cover)),
-          padding: EdgeInsets.only(top: 190),
+          padding: EdgeInsets.only(top: Platform.isIOS ? 210 : 190),
           child: new ListView.builder(
               shrinkWrap: true,
               itemCount: _itemList.length,
@@ -60,18 +60,15 @@ class VideoPlayState extends State<VideoPlayPage> {
               }),
         ),
         new Container(
-          height: 190,
-          margin: EdgeInsets.only(top: 20),
+          margin: EdgeInsets.only(top: Platform.isIOS ? 0 : 20),
           width: MediaQuery.of(context).size.width,
           child: new LinVideoView(
             controller: _controller,
-            placeHolder: new Hero(
-                tag: _tag,
-                child: new Image(
-                  image: NetworkImage(_itemData['cover']['feed']),
-                  fit: BoxFit.cover,
-                )),
-            height: 190,
+            placeHolder: new Image(
+              image: NetworkImage(_itemData['cover']['feed']),
+              fit: BoxFit.cover,
+            ),
+            height: Platform.isIOS ? 210 : 190,
             autoPlay: false,
             title: _itemData['title'],
           ),

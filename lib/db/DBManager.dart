@@ -39,8 +39,6 @@ class DBManager {
   saveHomeTabList(TabList tabList) async {
     var dbClient = await db;
     var batch = dbClient.batch();
-    TabInfo tabInfo = new TabInfo(-5, '关注', '', '');
-    batch.insert('HomeTabList', tabInfo.toMap());
     tabList.tabList.forEach((tabInfo) {
       batch.insert('HomeTabList', tabInfo.toMap());
     });

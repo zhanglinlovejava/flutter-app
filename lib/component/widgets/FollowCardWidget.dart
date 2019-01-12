@@ -7,7 +7,6 @@ class FollowCardWidget extends StatelessWidget {
   final String avatar;
   final String desc;
   final String title;
-  final heroTag;
   final int duration;
   final bool showBottomAvatar;
   final VoidCallback onCoverTap;
@@ -19,7 +18,6 @@ class FollowCardWidget extends StatelessWidget {
     @required this.avatar,
     @required this.desc,
     @required this.title,
-    @required this.heroTag,
     @required this.duration,
     @required this.id,
     @required this.userType,
@@ -48,12 +46,10 @@ class FollowCardWidget extends StatelessWidget {
                     ], 3),
                     child: new ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(3)),
-                        child: new Hero(
-                            tag: heroTag,
-                            child: new Image.network(
+                        child:  new Image.network(
                               cover,
                               fit: BoxFit.cover,
-                            ))),
+                            )),
                   )),
               ActionViewUtils.buildDuration(duration)
             ],

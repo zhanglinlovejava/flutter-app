@@ -68,7 +68,7 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
     return Offstage(
       offstage: !showInfoView,
       child: new Container(
-        height: 187,
+        height: 200,
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.5)),
         padding: EdgeInsets.all(10),
         child: Column(
@@ -78,7 +78,7 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
               name: data['owner']['nickname'],
               avatar: data['owner']['avatar'],
               id: data['owner']['uid'].toString(),
-              userType: 'normal',
+              userType: data['owner']['userType'],
               rightBtnType: 'follow',
             ),
             Container(

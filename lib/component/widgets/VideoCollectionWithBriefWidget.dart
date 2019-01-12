@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'AuthorInfoWidget.dart';
 import 'SquareCardCollectionWidget.dart';
+import 'package:flutter_open/utils/ActionViewUtils.dart';
 
 class VideoCollectionWithBriefWidget extends StatelessWidget {
   final data;
@@ -10,6 +11,7 @@ class VideoCollectionWithBriefWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Container(
+       decoration: ActionViewUtils.renderBorderBottom(),
       child: new Column(
         children: <Widget>[
           new Padding(

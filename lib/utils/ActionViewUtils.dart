@@ -18,7 +18,10 @@ class ActionViewUtils {
             end: Alignment.bottomCenter));
   }
 
-
+  static renderBorderBottom() {
+    return BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[200], width: 0.5)));
+  }
 
   static buildDuration(int duration) {
     return new Positioned(

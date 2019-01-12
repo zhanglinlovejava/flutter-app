@@ -71,8 +71,8 @@ class _HomePageState extends BaseAliveSate<HomePage>
     return new Container(
       decoration: BoxDecoration(
           border:
-          Border(bottom: BorderSide(color: Colors.grey[200], width: 1))),
-      padding: EdgeInsets.only(left: 5, right: 5, top: 5,bottom: 3),
+              Border(bottom: BorderSide(color: Colors.grey[200], width: 1))),
+      padding: EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 3),
       child: new Row(
         children: <Widget>[
           new Container(
@@ -148,12 +148,6 @@ class _HomePageState extends BaseAliveSate<HomePage>
     } else {
       tabList = await dbClient.queryHomeTabList();
       if (tabList.tabList.length == 0) {
-        tabs.insert(
-            0,
-            Tab(
-              text: "关注",
-              key: Key('-5'),
-            ));
         _fetchTabList();
       } else {
         initTabBar(tabList);
