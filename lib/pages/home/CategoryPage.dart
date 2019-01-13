@@ -75,7 +75,6 @@ class _CategoryPageState extends BaseAliveSate<CategoryPage> {
                     margin: EdgeInsets.only(bottom: 10),
                   );
                 } else if (type == 'videoSmallCard') {
-                  var _data = data['content']['data'];
                   return VideoSmallCardWidget(
                     id: data['id'],
                     cover: data['cover']['feed'],
@@ -84,13 +83,13 @@ class _CategoryPageState extends BaseAliveSate<CategoryPage> {
                     category: data['category'],
                     onCoverTap: () {
                       ActionViewUtils.actionVideoPlayPage(context,
-                          desc: _data['description'],
-                          id: _data['id'],
-                          category: _data['category'],
-                          author: _data['author'],
-                          cover: _data['cover'],
-                          consumption: _data['consumption'],
-                          title: _data['title']);
+                          desc: data['description'],
+                          id: data['id'],
+                          category: data['category'],
+                          author: data['author'],
+                          cover: data['cover'],
+                          consumption: data['consumption'],
+                          title: data['title']);
                     },
                   );
                 } else {

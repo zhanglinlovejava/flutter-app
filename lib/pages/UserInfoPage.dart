@@ -325,11 +325,7 @@ class _UserInfoPageState extends State<UserInfoPage>
     params['userType'] = widget.userType.toUpperCase();
     await HttpController.getInstance().get(API.USER_TABS, (data) {
       var tabInfo = data['tabInfo'];
-      if (widget.userType == 'PGC') {
-        _userInfo = data['pgcInfo'];
-      } else if (widget.userType == 'NORMAL') {
-        _userInfo = data['userInfo'];
-      }
+      _userInfo = data['pgcInfo'] == null ? data['userInfo'] : data['pgcInfo'];
       if (tabInfo == null || tabInfo['tabList'] == null || _userInfo == null) {
         _status = LoadingStatus.error;
         _errMsg = data['errorMessage'] ?? '加载出错了~';

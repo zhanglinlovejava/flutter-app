@@ -207,7 +207,7 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
       icon = owner['avatar'];
       name = owner['nickname'];
       id = owner['uid'].toString();
-      userType = owner['userType'];
+      userType = 'NORMAL';
     } else {
       icon = author['icon'];
       name = author['name'];
