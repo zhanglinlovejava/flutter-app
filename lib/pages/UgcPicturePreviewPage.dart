@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open/component/widgets/AuthorInfoWidget.dart';
+import 'package:flutter_open/api/HttpController.dart';
+import 'package:flutter_open/component/loading/loading_view.dart';
+import 'package:flutter_open/component/loading/LoadingStatus.dart';
+import 'package:flutter_open/component/loading/platform_adaptive_progress_indicator.dart';
+import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
+import 'package:flutter_open/component/widgets/image/CustomImage.dart';
+import '../pages/StickyHeaderTabPage.dart';
+import '../api/API.dart';
 
 class UgcPicturePreviewWidget extends StatefulWidget {
-  final data;
   final index;
+  final String resourceType;
+  final int id;
 
-  UgcPicturePreviewWidget(this.data, {this.index});
+  UgcPicturePreviewWidget({
+    this.index = 0,
+    @required this.resourceType,
+    @required this.id,
+  });
 
   @override
   _UgcPicturePreviewWidget createState() => _UgcPicturePreviewWidget();
@@ -13,26 +26,22 @@ class UgcPicturePreviewWidget extends StatefulWidget {
 
 class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
     with SingleTickerProviderStateMixin {
-  List<dynamic> images = [];
-  var data;
-  TabController tabController;
+  var _data;
+  TabController _tabController;
   VoidCallback tabListener;
   int currentIndex = 0;
   bool showInfoView = true;
+  LoadingStatus _status = LoadingStatus.loading;
 
   @override
   void initState() {
     super.initState();
-    data = widget.data;
-    images = data['urls'];
     currentIndex = widget.index;
-    tabController = TabController(length: images.length, vsync: this);
-    tabController.animateTo(currentIndex);
     tabListener = () {
-      currentIndex = tabController.index;
+      currentIndex = _tabController.index;
       setState(() {});
     };
-    tabController.addListener(tabListener);
+    _fetchUGCInfo();
   }
 
   @override
@@ -40,27 +49,39 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
     return new Container(
       color: Colors.black,
       margin: EdgeInsets.only(top: 20),
-      child: Stack(
-        alignment: Alignment(0, 1),
-        children: <Widget>[
-          TabBarView(
-              controller: tabController, children: _renderImagesView(context)),
-          Positioned(
-            top: 10,
-            child: Offstage(
-              offstage: images.length <= 1,
-              child: Text('${(currentIndex + 1)}/${images.length}',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      decoration: TextDecoration.none,
-                      fontWeight: FontWeight.normal)),
-            ),
+      child: LoadingView(
+          status: _status,
+          loadingContent: PlatformAdaptiveProgressIndicator(
+            strokeWidth: 2,
           ),
-          _renderCloseBtn(),
-          _renderInfo()
-        ],
-      ),
+          errorContent: LoadErrorWidget(onRetryFunc: () {
+            _fetchUGCInfo();
+          }),
+          successContent: _data == null
+              ? new Container()
+              : Stack(
+                  alignment: Alignment(0, 1),
+                  children: <Widget>[
+                    TabBarView(
+                        controller: _tabController,
+                        children: _renderImagesView(context)),
+                    Positioned(
+                      top: 10,
+                      child: Offstage(
+                        offstage: _data['urls'].length <= 1,
+                        child: Text(
+                            '${(currentIndex + 1)}/${_data['urls'].length}',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                decoration: TextDecoration.none,
+                                fontWeight: FontWeight.normal)),
+                      ),
+                    ),
+                    _renderCloseBtn(),
+                    _renderInfo()
+                  ],
+                )),
     );
   }
 
@@ -75,17 +96,17 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             AuthorInfoWidget(
-              name: data['owner']['nickname'],
-              avatar: data['owner']['avatar'],
-              id: data['owner']['uid'].toString(),
-              userType: data['owner']['userType'],
+              name: _data['owner']['nickname'],
+              avatar: _data['owner']['avatar'],
+              id: _data['owner']['uid'].toString(),
+              userType: _data['owner']['userType'],
               rightBtnType: 'follow',
             ),
             Container(
               alignment: Alignment.centerLeft,
               margin: EdgeInsets.only(top: 10),
               child: Text(
-                data['description'],
+                _data['description'],
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -109,23 +130,34 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
       margin: EdgeInsets.only(bottom: 5, top: 10),
       child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: (data['tags'] ?? []).length,
+          itemCount: (_data['tags'] ?? []).length,
           itemBuilder: (BuildContext context, int index) {
-            return new Container(
-              margin: EdgeInsets.only(right: 5),
-              padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
-              decoration: BoxDecoration(
-                  color: Color.fromRGBO(200, 200, 200, 0.50),
-                  borderRadius: BorderRadius.all(Radius.circular(3))),
-              child: Text(
-                data['tags'][index]['name'],
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.normal,
-                    decoration: TextDecoration.none),
+            return GestureDetector(
+              child: new Container(
+                margin: EdgeInsets.only(right: 5),
+                padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
+                decoration: BoxDecoration(
+                    color: Color.fromRGBO(200, 200, 200, 0.50),
+                    borderRadius: BorderRadius.all(Radius.circular(3))),
+                child: Text(
+                  _data['tags'][index]['name'],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.normal,
+                      decoration: TextDecoration.none),
+                ),
               ),
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (BuildContext context) {
+                  Map<String, String> params = new Map();
+                  params['id'] = _data['tags'][index]['id'].toString();
+                  return StickyHeaderTabPage(
+                      url: API.TAG_INFO_TAB, params: params, type: 'tagInfo');
+                }));
+              },
             );
           }),
     );
@@ -150,7 +182,7 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
               new Padding(
                 padding: EdgeInsets.only(left: 5),
                 child: Text(
-                  data['consumption']['collectionCount'].toString(),
+                  _data['consumption']['collectionCount'].toString(),
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -170,7 +202,7 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
               new Padding(
                 padding: EdgeInsets.only(left: 5),
                 child: Text(
-                  data['consumption']['replyCount'].toString(),
+                  _data['consumption']['replyCount'].toString(),
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -218,7 +250,7 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
 
   List<Widget> _renderImagesView(BuildContext context) {
     List<Widget> imageViews = [];
-    images.forEach((url) {
+    _data['urls'].forEach((url) {
       imageViews.add(GestureDetector(
         onTap: () {
           setState(() {
@@ -226,15 +258,38 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
           });
         },
         child: new Container(
-          child: Image.network(
+          child: CustomImage(
             url,
             height: double.infinity,
             width: double.infinity,
             fit: BoxFit.contain,
+            showLoading: true,
+            placeHolePath: '',
           ),
         ),
       ));
     });
     return imageViews;
+  }
+
+  _fetchUGCInfo() async {
+    Map<String, String> params = new Map();
+    params['resourceType'] = widget.resourceType;
+    await HttpController.getInstance().get('v2/video/${widget.id}', (data) {
+      _data = data;
+      if (mounted) {
+        _tabController =
+            TabController(length: _data['urls'].length, vsync: this);
+        _tabController.animateTo(currentIndex);
+        _tabController.addListener(tabListener);
+        _status = LoadingStatus.success;
+        setState(() {});
+      }
+    }, errorCallback: (error) {
+      _status = LoadingStatus.error;
+      if (mounted) {
+        setState(() {});
+      }
+    }, params: params);
   }
 }

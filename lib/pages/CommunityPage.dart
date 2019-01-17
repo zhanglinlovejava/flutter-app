@@ -3,19 +3,15 @@ import 'package:flutter_open/api/HttpController.dart';
 import 'package:flutter_open/component/loading/loading_view.dart';
 import 'package:flutter_open/component/loading/LoadingStatus.dart';
 import 'package:flutter_open/component/loading/platform_adaptive_progress_indicator.dart';
-import 'package:flutter_open/pages/community/CommunityItemPage.dart';
+import 'package:flutter_open/pages/CommonListPage.dart';
 import 'package:flutter_open/component/BaseAliveState.dart';
 import 'package:flutter_open/entity/TabList.dart';
 import 'package:flutter_open/entity/TabInfo.dart';
-import 'package:flutter_open/db/DBManager.dart';
 import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
 import 'package:flutter_open/api/API.dart';
+import 'SearchPage.dart';
 
 class CommunityPage extends StatefulWidget {
-  final TabList communityTabList;
-
-  CommunityPage(this.communityTabList);
-
   @override
   _CommunityPageState createState() {
     return _CommunityPageState();
@@ -45,14 +41,14 @@ class _CommunityPageState extends BaseAliveSate<CommunityPage>
         tabs = tabs;
       });
     };
-    _getTabListIfNeed();
+    _fetchTabList();
   }
 
   @override
   Widget build(BuildContext context) {
     return new LoadingView(
         status: _status,
-        loadingContent: const PlatformAdaptiveProgressIndicator(),
+        loadingContent: const PlatformAdaptiveProgressIndicator(strokeWidth: 2),
         errorContent: LoadErrorWidget(onRetryFunc: () {
           _fetchTabList();
         }),
@@ -75,20 +71,32 @@ class _CommunityPageState extends BaseAliveSate<CommunityPage>
 
   _renderAppBar() {
     return new Container(
-      padding: EdgeInsets.only(top: 10, right: 10),
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      height: 35,
+      padding: EdgeInsets.only(top: 10),
+      child: new Stack(
         children: <Widget>[
-          Expanded(
-              child: new Container(
+          new Container(
             alignment: Alignment.center,
             child: Text('subscription',
                 style: TextStyle(
                     color: Colors.black, fontFamily: 'Lobster', fontSize: 20)),
-          )),
-          Icon(
-            Icons.search,
-            size: 25,
+          ),
+          Positioned(
+            right: 0,
+            child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (BuildContext context) {
+                    return SearchPage();
+                  }));
+                },
+                child: Container(
+                  padding: EdgeInsets.only(right: 10),
+                  child: Icon(
+                    Icons.search,
+                    size: 27,
+                  ),
+                )),
           )
         ],
       ),
@@ -140,29 +148,9 @@ class _CommunityPageState extends BaseAliveSate<CommunityPage>
     );
   }
 
-  _getTabListIfNeed() async {
-    DBManager _db = DBManager();
-    if (widget.communityTabList != null &&
-        widget.communityTabList.tabList != null &&
-        widget.communityTabList.tabList.length > 0) {
-      tabList = widget.communityTabList;
-      initTabView();
-    } else {
-      tabList = await _db.queryCommunityTabList();
-      if (tabList == null ||
-          tabList.tabList == null ||
-          tabList.tabList.length == 0) {
-        _fetchTabList();
-      } else {
-        initTabView();
-      }
-    }
-  }
-
   _fetchTabList() async {
     HttpController.getInstance().get(API.COMMUNITY_TAB, (data) {
       tabList = TabList.map(data['tabInfo']['tabList']);
-      DBManager().saveHomeTabList(tabList);
       initTabView();
     }, errorCallback: (error) {
       if (mounted) {
@@ -176,7 +164,7 @@ class _CommunityPageState extends BaseAliveSate<CommunityPage>
   void initTabView() {
     for (var i = 0; i < tabList.tabList.length - 1; i++) {
       tabs.add(_renderTab(tabList.tabList[i], i == currentIndex));
-      pagesList.add(CommunityItemPage(tabList.tabList[i].apiUrl));
+      pagesList.add(CommonListPage(tabList.tabList[i].apiUrl));
     }
     _tabController = TabController(vsync: this, length: tabs.length);
     _tabController.removeListener(tabListener);

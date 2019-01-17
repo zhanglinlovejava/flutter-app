@@ -17,7 +17,7 @@ class LoadingView extends StatefulWidget {
     @required this.loadingContent,
     @required this.errorContent,
     @required this.successContent,
-    @required this.emptyContent,
+    this.emptyContent,
   });
 
   final LoadingStatus status;

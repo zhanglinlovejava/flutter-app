@@ -2,8 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'dart:io';
-import 'package:flutter_open/entity/TabList.dart';
-import 'package:flutter_open/entity/TabInfo.dart';
+import '../entity/SearchEntity.dart';
 
 class DBManager {
   static final DBManager _instance = new DBManager.internal();
@@ -30,50 +29,50 @@ class DBManager {
 
   void _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE HomeTabList (id INTEGER , name TEXT, apiUrl TEXT, bgPicture TEXT)");
-    await db.execute(
-        "CREATE TABLE CommunityTabList (id INTEGER , name TEXT, apiUrl TEXT, bgPicture TEXT)");
+        "CREATE TABLE SEARCH_HISTORY_LIST (id INTEGER PRIMARY KEY , name TEXT )");
   }
 
   //insert
-  saveHomeTabList(TabList tabList) async {
-    var dbClient = await db;
-    var batch = dbClient.batch();
-    tabList.tabList.forEach((tabInfo) {
-      batch.insert('HomeTabList', tabInfo.toMap());
-    });
-    await batch.commit();
-  }
-
-  saveCommunityTabList(TabList tabList) async {
-    var dbClient = await db;
-    var batch = dbClient.batch();
-    tabList.tabList.forEach((tabInfo) {
-      batch.insert('CommunityTabList', tabInfo.toMap());
-    });
-    await batch.commit();
-  }
-
-  Future<TabList> queryCommunityTabList() async {
-    var dbClient = await db;
-    List<dynamic> tabList = new List();
-    try {
-      tabList = await dbClient.query("CommunityTabList");
-    } catch (e) {
-      print(e);
+  saveSearchHisList(SearchEntity entity) async {
+    List<SearchEntity> list = await querySearchHisList();
+    bool notExist = true;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].name == entity.name) {
+        notExist = false;
+        break;
+      }
     }
-    return TabList.map(tabList);
+    var dbClient = await db;
+    var batch = dbClient.batch();
+    if (!notExist) {
+      batch.rawDelete(
+          'DELETE FROM SEARCH_HISTORY_LIST WHERE id = ?', [entity.id]);
+    }
+    batch.insert('SEARCH_HISTORY_LIST', entity.toMap());
+    await batch.commit();
   }
 
   //query
-  Future<TabList> queryHomeTabList() async {
+  Future<List<SearchEntity>> querySearchHisList() async {
     var dbClient = await db;
-    List<dynamic> tabList = new List();
+    List<SearchEntity> searchList = new List();
     try {
-      tabList = await dbClient.query("HomeTabList");
+      List<dynamic> list = await dbClient.query("SEARCH_HISTORY_LIST");
+      list.forEach((item) {
+        searchList.add(SearchEntity.map(item));
+      });
     } catch (e) {
       print(e);
     }
-    return TabList.map(tabList);
+    searchList.sort((a, b) => b.id.compareTo(a.id));
+    return searchList;
+  }
+
+  deleteSearchHis(SearchEntity entity) async {
+    var dbClient = await db;
+    var batch = dbClient.batch();
+    batch
+        .rawDelete('DELETE FROM SEARCH_HISTORY_LIST WHERE id = ?', [entity.id]);
+    await batch.commit();
   }
 }

@@ -36,13 +36,21 @@ class StringUtil {
     return tagStr;
   }
 
-  static formatMileToDate({int miles = 0, String separator = '/'}) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(miles);
-    var year = dateTime.year;
-    int month = dateTime.month;
-    int day = dateTime.day;
-    String monthStr = month < 10 ? '0$month' : month.toString();
-    String dayStr = day < 10 ? '0$day' : day.toString();
-    return '$year$separator$monthStr$separator$dayStr';
+  static Map<String, String> getParamsFromUrl(String actionUrl) {
+    Map<String, String> params = new Map();
+    List<String> array = actionUrl.split('?');
+    List<String> keyValues = array[1].split('&');
+    for (var i = 0; i < keyValues.length; i++) {
+      List<String> kvs = keyValues[i].split('=');
+      params['${kvs[0]}'] = kvs[1];
+    }
+    return params;
+  }
+
+  static String getTagIdFromActionUrl(String actionUrl) {
+    if (actionUrl == null) return '';
+    List<String> strings = actionUrl.split('/');
+    String tagId = strings[3];
+    return tagId;
   }
 }

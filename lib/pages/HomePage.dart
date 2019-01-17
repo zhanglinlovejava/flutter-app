@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open/api/HttpController.dart';
-import 'package:flutter_open/pages/home/CategoryPage.dart';
-import 'package:flutter_open/pages/home/DiscoveryPage.dart';
-import 'package:flutter_open/pages/home/RecommendPage.dart';
-import 'package:flutter_open/pages/home/DailyPage.dart';
-import 'package:flutter_open/pages/home/FollowPage.dart';
+import 'package:flutter_open/pages/CommonListPage.dart';
 import 'package:flutter_open/component/loading/loading_view.dart';
 import 'package:flutter_open/component/loading/LoadingStatus.dart';
 import 'package:flutter_open/component/loading/platform_adaptive_progress_indicator.dart';
 import 'package:flutter_open/entity/TabList.dart';
-import 'package:flutter_open/db/DBManager.dart';
 import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
 import 'package:flutter_open/component/BaseAliveState.dart';
 import 'package:flutter_open/api/API.dart';
+import 'SearchPage.dart';
 
 class HomePage extends StatefulWidget {
   final TabList homeTabList;
@@ -45,7 +41,8 @@ class _HomePageState extends BaseAliveSate<HomePage>
         width: double.infinity,
         child: new LoadingView(
           status: _status,
-          loadingContent: const PlatformAdaptiveProgressIndicator(),
+          loadingContent:
+              const PlatformAdaptiveProgressIndicator(strokeWidth: 2),
           errorContent: LoadErrorWidget(onRetryFunc: () {
             _fetchTabList();
           }),
@@ -72,7 +69,7 @@ class _HomePageState extends BaseAliveSate<HomePage>
       decoration: BoxDecoration(
           border:
               Border(bottom: BorderSide(color: Colors.grey[200], width: 1))),
-      padding: EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 3),
+      padding: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 5),
       child: new Row(
         children: <Widget>[
           new Container(
@@ -102,12 +99,20 @@ class _HomePageState extends BaseAliveSate<HomePage>
                           unselectedLabelColor: Colors.grey[400],
                           controller: _tabController)),
                 ),
-          new Container(
-            width: 35,
-            child: new Icon(
-              Icons.search,
-              color: Colors.black,
-              size: 25,
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (BuildContext context) {
+                return SearchPage();
+              }));
+            },
+            child: new Container(
+              width: 35,
+              child: new Icon(
+                Icons.search,
+                color: Colors.black,
+                size: 27,
+              ),
             ),
           ),
         ],
@@ -121,24 +126,21 @@ class _HomePageState extends BaseAliveSate<HomePage>
       List<String> strings = tab.key.toString().split("'");
       int id = int.parse(strings[1]);
       if (id > 0) {
-        list.add(new CategoryPage(
-          categoryId: id,
-        ));
+        list.add(CommonListPage('${API.CATEGORY_LIST}/$id'));
       } else if (id == -1) {
-        list.add(DiscoveryPage());
+        list.add(CommonListPage(API.DISCOVERY_LIST));
       } else if (id == -2) {
-        list.add(RecommendPage());
+        list.add(CommonListPage(API.RECOMMEND_LIST,changeTab: _scrollToTap));
       } else if (id == -3) {
-        list.add(DailyPage());
+        list.add(CommonListPage(API.DAILY_LIST));
       } else if (id == -5) {
-        list.add(FollowPage());
+        list.add(CommonListPage(API.FOLLOW_LIST));
       }
     });
     return list;
   }
 
   _getTabListIfNeed() async {
-    var dbClient = DBManager();
     TabList tabList;
     if (widget.homeTabList != null &&
         widget.homeTabList.tabList != null &&
@@ -146,19 +148,13 @@ class _HomePageState extends BaseAliveSate<HomePage>
       tabList = widget.homeTabList;
       initTabBar(tabList);
     } else {
-      tabList = await dbClient.queryHomeTabList();
-      if (tabList.tabList.length == 0) {
-        _fetchTabList();
-      } else {
-        initTabBar(tabList);
-      }
+      _fetchTabList();
     }
   }
 
   _fetchTabList() async {
     await HttpController.getInstance().get(API.HOME_TAB, (data) {
       TabList tabList = TabList.map(data['tabInfo']['tabList']);
-      DBManager().saveHomeTabList(tabList);
       initTabBar(tabList);
     }, errorCallback: (error) {});
   }
@@ -175,5 +171,9 @@ class _HomePageState extends BaseAliveSate<HomePage>
     setState(() {
       _status = LoadingStatus.success;
     });
+  }
+
+  _scrollToTap(int index) {
+    _tabController.animateTo(index);
   }
 }

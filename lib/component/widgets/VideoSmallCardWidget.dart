@@ -8,13 +8,15 @@ class VideoSmallCardWidget extends StatelessWidget {
   final String title;
   final String category;
   final VoidCallback onCoverTap;
+  final isDarkTheme;
 
   VideoSmallCardWidget(
-      {@required this.id,
+      {this.id,
       @required this.cover,
-      @required this.duration,
+      this.duration = 0,
       @required this.title,
       @required this.onCoverTap,
+      this.isDarkTheme = true,
       @required this.category});
 
   @override
@@ -40,14 +42,16 @@ class VideoSmallCardWidget extends StatelessWidget {
                     ], 5),
                     child: new ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(3)),
-                        child:  new Image.network(
-                              cover,
-                              width: 160,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                            )),
+                        child: new Image.network(
+                          cover == '' ? 'http://' : cover,
+                          width: 160,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                        )),
                   ),
-                  ActionViewUtils.buildDuration(duration)
+                  duration == 0
+                      ? new Container()
+                      : ActionViewUtils.buildDuration(duration)
                 ],
               ),
               Expanded(
@@ -61,7 +65,7 @@ class VideoSmallCardWidget extends StatelessWidget {
                         title,
                         style: TextStyle(
                             fontSize: 14,
-                            color: Colors.black,
+                            color: isDarkTheme ? Colors.black : Colors.white,
                             fontFamily: 'FZLanTing'),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -70,7 +74,7 @@ class VideoSmallCardWidget extends StatelessWidget {
                         '#$category',
                         style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey,
+                            color: isDarkTheme ? Colors.grey : Colors.white70,
                             fontFamily: 'FZLanTing'),
                       ),
                     ],

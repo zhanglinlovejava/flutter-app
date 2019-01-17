@@ -24,13 +24,6 @@ class HttpController {
         "User-Agent":
             "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63",
       },
-//        data: {
-//          'udid': 'efa9668e70684bdcacc9fa33b6fbc405c3d770a2',
-////          'udid': '2bad2287b35b4303a340cdfba488af4526d1e2ca',
-//          'vc': 443,
-//          'vn': '4.9.1',
-//          'deviceModel': 'PRO%206%20Plus'
-//        }
     );
     dio = new Dio(options);
   }
@@ -73,6 +66,7 @@ class HttpController {
       if (callback != null) {
         callback(response.data);
       }
+      print('base -->${response.data}');
     } on DioError catch (e) {
       print('error:===$e');
       if (CancelToken.isCancel(e)) {

@@ -11,7 +11,7 @@ class VideoCollectionWithBriefWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Container(
-       decoration: ActionViewUtils.renderBorderBottom(),
+      decoration: ActionViewUtils.renderBorderBottom(),
       child: new Column(
         children: <Widget>[
           new Padding(
@@ -26,12 +26,8 @@ class VideoCollectionWithBriefWidget extends StatelessWidget {
               rightBtnType: 'follow',
             ),
           ),
-          SquareCardCollectionWidget(
-            data,
-            height: 250,
-            showTopView: false,
-            showBottomAvatar: false,
-          )
+          SquareCardCollectionWidget(data,
+              showTopView: false, showBottomAvatar: false)
         ],
       ),
     );

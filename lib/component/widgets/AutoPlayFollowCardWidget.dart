@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open/component/widgets/VideoCardWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
-import 'package:flutter_open/utils/StringUtil.dart';
+import 'package:flutter_open/utils/DayFormat.dart';
 import 'package:flutter_open/component/widgets/UgcPictureWidget.dart';
 import 'AuthorInfoWidget.dart';
+import '../../Constants.dart';
+import '../../pages/StickyHeaderTabPage.dart';
+import '../../api/API.dart';
 
 class AutoPlayFollowCardWidget extends StatefulWidget {
   final data;
@@ -58,7 +61,7 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
               desc: _data['description'],
               id: _data['id'],
               category: _data['category'],
-              author: _data['author']??_data['owner'],
+              author: _data['author'] ?? _data['owner'],
               cover: _data['cover'],
               consumption: _data['consumption'],
               title: _data['title']);
@@ -84,16 +87,30 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
                 scrollDirection: Axis.horizontal,
                 itemCount: tags.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return new Container(
-                    margin: EdgeInsets.only(right: 5),
-                    padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(80, 135, 200, 0.10),
-                        borderRadius: BorderRadius.all(Radius.circular(3))),
-                    child: Text(
-                      tags[index]['name'],
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xff5087c8), fontSize: 14),
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (BuildContext context) {
+                        Map<String, String> params = new Map();
+                        params['id'] = tags[index]['id'].toString();
+                        return StickyHeaderTabPage(
+                            url: API.TAG_INFO_TAB,
+                            params: params,
+                            type: 'tagInfo');
+                      }));
+                    },
+                    child: new Container(
+                      margin: EdgeInsets.only(right: 5),
+                      padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
+                      decoration: BoxDecoration(
+                          color: Color.fromRGBO(80, 135, 200, 0.10),
+                          borderRadius: BorderRadius.all(Radius.circular(3))),
+                      child: Text(
+                        tags[index]['name'],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: ConsColors.mainColor, fontSize: 14),
+                      ),
                     ),
                   );
                 }),
@@ -131,7 +148,7 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
                       child: Text(
                         '更多',
                         style: TextStyle(
-                            color: Color(0xff5087c8),
+                            color: ConsColors.mainColor,
                             fontFamily: 'FZLanTing',
                             fontSize: 13),
                       ),
@@ -185,8 +202,7 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
             ],
           ),
           Text(
-            StringUtil.formatMileToDate(
-                miles: data['content']['data']['releaseTime']),
+            TimelineUtil.format(data['content']['data']['releaseTime']),
             style: TextStyle(color: Colors.grey),
           ),
           Icon(
@@ -203,16 +219,18 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
     var author = data['content']['data']['author'];
     var owner = data['content']['data']['owner'];
     String icon, name, id, userType;
-    if (author == null) {
+    if (owner != null) {
       icon = owner['avatar'];
       name = owner['nickname'];
       id = owner['uid'].toString();
       userType = 'NORMAL';
-    } else {
+    } else if (author != null) {
       icon = author['icon'];
       name = author['name'];
       id = author['id'].toString();
       userType = 'PGC';
+    } else {
+      return Container();
     }
     return AuthorInfoWidget(
       name: name,

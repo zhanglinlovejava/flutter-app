@@ -4,24 +4,32 @@ class LoadEmptyWidget extends StatelessWidget {
   final VoidCallback onRetryFunc;
   final String emptyMsg;
 
-  LoadEmptyWidget({@required this.onRetryFunc, this.emptyMsg = '不好意思，没有数据哦~'});
+  LoadEmptyWidget({@required this.onRetryFunc, this.emptyMsg = '暂无数据'});
 
   @override
   Widget build(BuildContext context) {
-    return new GestureDetector(
-      onTap: onRetryFunc,
-      child: Container(
-        child: new Row(
+    return Container(
+      color: Colors.white,
+      width: double.infinity,
+      child: new GestureDetector(
+        onTap: onRetryFunc,
+        child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new Icon(
-              Icons.hourglass_empty,
-              color: Colors.blue,
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              child: new Image.asset(
+                'asset/images/empty_logo.png',
+                width: 30,
+                height: 30,
+              ),
             ),
             Text(
               emptyMsg,
               style: new TextStyle(
-                  fontSize: 18,
+                  fontSize: 13,
+                  color: Colors.black54,
+                  fontFamily: 'FZLanTing',
                   fontWeight: FontWeight.normal,
                   decoration: TextDecoration.none),
             )

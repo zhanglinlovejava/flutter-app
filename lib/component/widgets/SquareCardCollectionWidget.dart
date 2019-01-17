@@ -3,28 +3,42 @@ import 'package:flutter_open/component/widgets/FollowCardWidget.dart';
 import 'package:flutter_open/component/widgets/SingleBannerWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
 import 'BriefCardWidget.dart';
+import '../../Constants.dart';
+import 'TextCardWidget.dart';
+import '../../api/API.dart';
 
 class SquareCardCollectionWidget extends StatelessWidget {
   final data;
-  final double height;
   final bool showTopView;
   final showBottomAvatar;
+  double height = 190;
+  final VoidCallback onRightTap;
 
   SquareCardCollectionWidget(this.data,
-      {this.height = 190,
-      this.showTopView = true,
-      this.showBottomAvatar = true});
+      {this.showTopView = true, this.showBottomAvatar = true, this.onRightTap});
 
   @override
   Widget build(BuildContext context) {
+    List childList = data['itemList'];
+    String type = childList[0]['type'];
+    if (type == 'followCard') {
+      height = 300;
+    } else if (type == 'banner' || type == 'banner2' || type == 'banner3') {
+      height = 220;
+    } else if (type == 'video') {
+      height = 242;
+    } else if (type == 'squareCardOfCategory') {
+      height = 150;
+    }
     return new Container(
+      margin: EdgeInsets.only(top: 10),
       height: height,
       child: new Column(
         children: <Widget>[
           showTopView ? _renderTopView() : new Container(),
           showTopView ? _renderMiddleView() : new Container(),
           Expanded(
-            child: _renderBottomView(context),
+            child: _renderBottomView(context, childList, type),
           )
         ],
       ),
@@ -39,44 +53,27 @@ class SquareCardCollectionWidget extends StatelessWidget {
             child: new Text(
               data['header']['subTitle'],
               style: TextStyle(
-                  fontFamily: 'FZLanTing', color: Colors.black45, fontSize: 12),
+                  fontFamily: ConsFonts.fzFont,
+                  color: Colors.black45,
+                  fontSize: 12),
             ),
           );
   }
 
   _renderMiddleView() {
-    return new Container(
-      margin: EdgeInsets.only(top: 5),
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Text(
-            data['header']['title'],
-            style: TextStyle(fontSize: 20, fontFamily: 'FZLanTing'),
-          ),
-          data['header']['rightText'] == null
-              ? new Container()
-              : new Row(
-                  children: <Widget>[
-                    Text(data['header']['rightText'],
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'FZLanTing',
-                            color: Color(0xff5087c8))),
-                    Image(
-                      image: AssetImage('asset/images/arrow_right_blue.png'),
-                      width: 10,
-                      height: 15,
-                    )
-                  ],
-                )
-        ],
-      ),
+    return TextCardWidget(
+      title: data['header']['title'],
+      rightBtnText: data['header']['rightText'],
+      onRightBtnTap: () {
+        if (onRightTap is VoidCallback) {
+          onRightTap();
+        }
+      },
+      align: MainAxisAlignment.spaceBetween,
     );
   }
 
-  _renderBottomView(BuildContext context) {
-    var childList = data['itemList'];
+  _renderBottomView(BuildContext context, childList, type) {
     double width =
         MediaQuery.of(context).size.width - (childList.length <= 1 ? 30 : 60);
     return new Container(
@@ -87,7 +84,6 @@ class SquareCardCollectionWidget extends StatelessWidget {
           itemCount: childList.length,
           itemBuilder: (BuildContext context, int index) {
             var item = childList[index]['data'];
-            var type = childList[index]['type'];
             if (type == 'followCard') {
               var _data = item['content']['data'];
               return new Container(
@@ -118,7 +114,7 @@ class SquareCardCollectionWidget extends StatelessWidget {
                 width: width,
                 margin: EdgeInsets.only(right: 10, top: 5),
                 child: SingleBannerWidget(
-                  item['image'],
+                  item,
                   height: height,
                 ),
               );
@@ -148,11 +144,18 @@ class SquareCardCollectionWidget extends StatelessWidget {
               );
             } else if (type == 'squareCardOfCategory') {
               return Container(
-                  width: 150,
-                  height: double.infinity,
-                  margin: EdgeInsets.only(right: 10),
-                  child: BriefCardWidget(
-                      icon: item['image'], title: item['title']));
+                width: 150,
+                height: double.infinity,
+                margin: EdgeInsets.only(right: 10),
+                child: BriefCardWidget(
+                    icon: item['image'],
+                    title: item['title'],
+                    onTap: () {
+                      ActionViewUtils.actionTagInfoPage(
+                          API.CATEGORY_INFO_TAB, context, item['actionUrl'],
+                          type: 'categoryInfo');
+                    }),
+              );
             } else {
               return Text(type + "----");
             }

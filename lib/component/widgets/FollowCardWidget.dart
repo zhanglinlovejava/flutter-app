@@ -37,7 +37,7 @@ class FollowCardWidget extends StatelessWidget {
                     onCoverTap();
                   },
                   child: new Container(
-                    height: 180,
+                    height: 170,
                     width: double.infinity,
                     decoration: ActionViewUtils.renderGradientBg([
                       Color.fromRGBO(0, 0, 0, 0.2),
@@ -46,26 +46,24 @@ class FollowCardWidget extends StatelessWidget {
                     ], 3),
                     child: new ClipRRect(
                         borderRadius: BorderRadius.all(Radius.circular(3)),
-                        child:  new Image.network(
-                              cover,
-                              fit: BoxFit.cover,
-                            )),
+                        child: new Image.network(
+                          cover,
+                          fit: BoxFit.cover,
+                        )),
                   )),
               ActionViewUtils.buildDuration(duration)
             ],
           ),
           Padding(
-            padding: EdgeInsets.only(top: 10,right: 5,bottom: 10),
+            padding: EdgeInsets.only(top: 10, right: 5, bottom: 10),
             child: AuthorInfoWidget(
-              name: title,
-              desc: desc,
-              avatar: avatar,
-              id: id,
-              userType: userType,
-              isDark: true,
-              rightBtnType: 'share',
-              showAvatar: showBottomAvatar,
-            ),
+                name: title,
+                desc: desc,
+                avatar: showBottomAvatar ? avatar : '',
+                id: id,
+                userType: userType,
+                isDark: true,
+                rightBtnType: 'share'),
           )
         ],
       ),

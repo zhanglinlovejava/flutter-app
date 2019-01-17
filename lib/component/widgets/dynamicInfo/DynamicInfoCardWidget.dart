@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'DynamicReplyCardWidget.dart';
-import 'DynamicFollowCardWidget.dart';
-import 'DynamicVideoCardWidget.dart';
+import 'package:flutter_open/component/widgets/dynamicInfo/DynamicReplyCardWidget.dart';
+import 'package:flutter_open/component/widgets/dynamicInfo/DynamicFollowCardWidget.dart';
+import 'package:flutter_open/component/widgets/dynamicInfo/DynamicVideoCardWidget.dart';
 
 class DynamicInfoCardWidget extends StatelessWidget {
   final data;

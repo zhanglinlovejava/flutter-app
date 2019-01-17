@@ -12,6 +12,8 @@ class PlatformAdaptiveProgressIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Platform.isIOS
         ? const CupertinoActivityIndicator()
-        : CircularProgressIndicator(strokeWidth: strokeWidth);
+        : CircularProgressIndicator(
+            strokeWidth: strokeWidth,
+          );
   }
 }

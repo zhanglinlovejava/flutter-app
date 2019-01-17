@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../component/IconTap.dart';
-import 'package:flutter_open/pages/home/HomePage.dart';
+import 'package:flutter_open/pages/HomePage.dart';
 import 'NotificationPage.dart';
-import 'package:flutter_open/pages/community/CommunityPage.dart';
+import 'package:flutter_open/pages/CommunityPage.dart';
 import './MinePage.dart';
 import '../entity/TabList.dart';
 import 'package:flutter_open/component/BaseAliveState.dart';
@@ -13,9 +13,8 @@ const int INDEX_MY = 3;
 
 class MainPage extends StatefulWidget {
   final TabList homeTabList;
-  final TabList communityTabList;
 
-  MainPage(this.homeTabList,this.communityTabList);
+  MainPage(this.homeTabList);
 
   @override
   _MainPageState createState() => _MainPageState();
@@ -46,7 +45,7 @@ class _MainPageState extends BaseAliveSate<MainPage>
       body: new TabBarView(
         children: <Widget>[
           new HomePage(widget.homeTabList),
-          new CommunityPage(widget.communityTabList),
+          new CommunityPage(),
           new NotificationPage(),
           new MinePage()
         ],

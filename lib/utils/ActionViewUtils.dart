@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open/pages/VideoPlayPage.dart';
 import 'package:flutter_open/utils/StringUtil.dart';
+import '../api/API.dart';
+import '../pages/StickyHeaderTabPage.dart';
 
 class ActionViewUtils {
   static actionVideoPlayPage(BuildContext context,
@@ -23,6 +25,23 @@ class ActionViewUtils {
         playUrl: playUrl,
         desc: desc,
       );
+    }));
+  }
+
+  static void actionTagInfoPage(String url,BuildContext context, String actionUrl,
+      {var follow,String type}) {
+    String tagId;
+    if (follow == null) {
+      tagId = StringUtil.getTagIdFromActionUrl(actionUrl);
+    } else {
+      tagId = follow['itemId'].toString();
+    }
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      Map<String, String> params = new Map();
+      params['id'] = tagId;
+      return StickyHeaderTabPage(
+          url: url, params: params, type: type);
     }));
   }
 

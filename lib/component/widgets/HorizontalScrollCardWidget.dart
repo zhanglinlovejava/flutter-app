@@ -33,7 +33,7 @@ class HorizontalScrollCardWidget extends StatelessWidget {
       height: 180,
       width: width,
       margin: EdgeInsets.only(right: 10),
-      child: SingleBannerWidget(data['image'], height: 180),
+      child: SingleBannerWidget(data, height: 180),
     );
   }
 }

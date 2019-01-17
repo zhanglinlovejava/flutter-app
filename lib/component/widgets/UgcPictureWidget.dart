@@ -142,17 +142,18 @@ class UgcPictureWidget extends StatelessWidget {
 
   BorderRadius _renderBorderRadius(List<double> borders) {
     return BorderRadius.only(
-                  topLeft: Radius.circular(borders[0]),
-                  topRight: Radius.circular(borders[1]),
-                  bottomRight: Radius.circular(borders[2]),
-                  bottomLeft: Radius.circular(borders[3]),
-                );
+      topLeft: Radius.circular(borders[0]),
+      topRight: Radius.circular(borders[1]),
+      bottomRight: Radius.circular(borders[2]),
+      bottomLeft: Radius.circular(borders[3]),
+    );
   }
 
   _actionToImagePreviewPage(BuildContext context, int index) {
     Navigator.of(context)
         .push(new MaterialPageRoute(builder: (BuildContext context) {
-      return UgcPicturePreviewWidget(data, index: index);
+      return UgcPicturePreviewWidget(
+          resourceType: data['resourceType'], id: data['id'], index: index);
     }));
   }
 }

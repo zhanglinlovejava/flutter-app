@@ -4,43 +4,49 @@ import 'package:flutter_open/component/loading/loading_view.dart';
 import 'package:flutter_open/component/loading/LoadingStatus.dart';
 import 'package:flutter_open/component/loading/platform_adaptive_progress_indicator.dart';
 import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
-import 'package:flutter_open/pages/community/CommunityItemPage.dart';
+import 'package:flutter_open/pages/CommonListPage.dart';
 import 'package:flutter_open/component/widgets/FollowBtnWidget.dart';
 import 'package:flutter_open/entity/TabList.dart';
-import 'package:flutter_open/api/API.dart';
 import 'dart:io';
+import '../component/widgets/FollowBtnWidget.dart';
+import '../Constants.dart';
 
 const double tabBarHeight = 40;
+double userInfoHeight = Platform.isIOS ? 356 : 336;
+double tagInfoHeight = Platform.isIOS ? 240 : 220;
 
-class UserInfoPage extends StatefulWidget {
-  final String id;
-  final String userType;
+class StickyHeaderTabPage extends StatefulWidget {
+  final Map<String, String> params;
+  final String url;
+  final String type;
 
-  UserInfoPage({this.id, this.userType});
+  StickyHeaderTabPage(
+      {@required this.url, @required this.params, this.type = 'userInfo'});
 
   @override
-  _UserInfoPageState createState() => _UserInfoPageState();
+  _StickyHeaderTabPageState createState() => _StickyHeaderTabPageState();
 }
 
-class _UserInfoPageState extends State<UserInfoPage>
+class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
     with SingleTickerProviderStateMixin {
-  double expandedHeight;
+  double _expandedHeight;
   LoadingStatus _status = LoadingStatus.loading;
-  ScrollController scrollController = ScrollController();
-  double scrollMaxHeight = 0;
-  double opacity = 0;
-  Color titleColor = Colors.white;
-  TabList tabList;
+  ScrollController _scrollController = ScrollController();
+  double _scrollMaxHeight = 0;
+  double _opacity = 0;
+  Color _titleColor = Colors.white;
+  TabList _tabList;
+  String _type;
   var _userInfo;
-  String _errMsg = '加载出错了，请稍后重试~';
 
   @override
   void initState() {
     super.initState();
-    expandedHeight = Platform.isIOS ? 356 : 336;
-    scrollController.addListener(() {
-      opacity = scrollController.offset / scrollMaxHeight;
-      titleColor = opacity > 0.6 ? titleColor = Colors.black : Colors.white;
+    _type = widget.type;
+    _expandedHeight = _type == 'userInfo' ? userInfoHeight : tagInfoHeight;
+    _scrollController.addListener(() {
+      _opacity = _scrollController.offset / _scrollMaxHeight;
+      _titleColor = _opacity > 0.6 ? _titleColor = Colors.black : Colors.white;
       setState(() {});
     });
     _fetchTabList();
@@ -48,26 +54,24 @@ class _UserInfoPageState extends State<UserInfoPage>
 
   @override
   Widget build(BuildContext context) {
-    scrollMaxHeight = expandedHeight - kToolbarHeight - tabBarHeight;
+    _scrollMaxHeight = _expandedHeight - kToolbarHeight - tabBarHeight;
     return new Container(
       color: Colors.white,
       child: LoadingView(
           status: _status,
-          loadingContent: PlatformAdaptiveProgressIndicator(),
-          errorContent: LoadErrorWidget(
-              errMsg: _errMsg,
-              onRetryFunc: () {
-                _fetchTabList();
-              }),
-          successContent: tabList == null ||
-                  tabList.tabList == null ||
-                  tabList.tabList.length == 0
+          loadingContent: PlatformAdaptiveProgressIndicator(strokeWidth: 2),
+          errorContent: LoadErrorWidget(onRetryFunc: () {
+            _fetchTabList();
+          }),
+          successContent: _tabList == null ||
+                  _tabList.tabList == null ||
+                  _tabList.tabList.length == 0
               ? new Container()
               : DefaultTabController(
-                  length: tabList.tabList.length,
+                  length: _tabList.tabList.length,
                   child: new Scaffold(
                     body: new NestedScrollView(
-                        controller: scrollController,
+                        controller: _scrollController,
                         headerSliverBuilder:
                             (BuildContext context, bool innerBoxIsScrolled) {
                           return _renderSliverBuilder(
@@ -88,8 +92,8 @@ class _UserInfoPageState extends State<UserInfoPage>
           title: Text(
             _userInfo['name'],
             style: TextStyle(
-                fontFamily: 'FZLanTing',
-                color: Color.fromRGBO(0, 0, 0, opacity),
+                fontFamily: ConsFonts.fzFont,
+                color: Color.fromRGBO(0, 0, 0, _opacity),
                 fontSize: 16),
             textAlign: TextAlign.left,
           ),
@@ -102,56 +106,136 @@ class _UserInfoPageState extends State<UserInfoPage>
               child: Icon(
                 Icons.arrow_back_ios,
                 size: 20,
-                color: titleColor,
+                color: _titleColor,
               ),
             ),
           ),
           pinned: true,
-          expandedHeight: expandedHeight,
+          expandedHeight: _expandedHeight,
           forceElevated: innerBoxIsScrolled,
           bottom: PreferredSize(
               child: renderTabBar(),
               preferredSize: new Size(double.infinity, tabBarHeight)),
-          flexibleSpace: renderHeaderView(),
+          flexibleSpace: _renderHeader(),
         ),
       )
     ];
   }
 
-  renderHeaderView() {
+  _renderTagInfoHeader() {
+    return Container(
+      height: _expandedHeight,
+      child: Stack(
+        alignment: AlignmentDirectional(0, 0.5),
+        children: <Widget>[
+          Container(
+            foregroundDecoration:
+                BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.4)),
+            child: Image.network(
+              _userInfo['headerImage'] ?? _userInfo['bgPicture'],
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
+          ),
+          Positioned(
+              top: 60,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.only(left: 50, right: 50),
+                    width: MediaQuery.of(context).size.width,
+                    child: Text(
+                      _userInfo['name'],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                          fontFamily: ConsFonts.fzFont),
+                    ),
+                  ),
+                  Container(
+                      alignment: Alignment.center,
+                      padding: EdgeInsets.all(8),
+                      width: MediaQuery.of(context).size.width,
+                      child: Text(_userInfo['description'] ?? ' ',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: Color(0xffdddddd), fontSize: 14))),
+                  _type == 'tagInfo'
+                      ? Row(
+                          children: <Widget>[
+                            Text('${_userInfo['tagFollowCount']}人关注',
+                                style: TextStyle(
+                                    color: Color(0xffdddddd), fontSize: 12)),
+                            Container(
+                                alignment: Alignment.center,
+                                margin: EdgeInsets.only(left: 10, right: 10),
+                                color: Color(0xffdddddd),
+                                height: 10,
+                                width: 1),
+                            Text('${_userInfo['lookCount']}人看过',
+                                style: TextStyle(
+                                    color: Color(0xffdddddd), fontSize: 12)),
+                          ],
+                        )
+                      : Container(),
+                  _type == 'tagInfo'
+                      ? Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: FollowBtnWidget())
+                      : Container()
+                ],
+              )),
+        ],
+      ),
+    );
+  }
+
+  _renderHeader() {
     return new Container(
       color: Colors.white,
       foregroundDecoration:
-          BoxDecoration(color: Color.fromRGBO(255, 255, 255, opacity)),
+          BoxDecoration(color: Color.fromRGBO(255, 255, 255, _opacity)),
       width: double.infinity,
       child: Stack(
         children: <Widget>[
-          Column(
-            children: <Widget>[
-              _renderBg(),
-              _renderAuthorInfo(),
-              _renderFollowerLayout()
-            ],
-          ),
-          Positioned(
-            top: 132,
-            left: 10,
-            child: Container(
-              decoration: BoxDecoration(
-                  color: Colors.white70,
-                  borderRadius: BorderRadius.all(Radius.circular(35)),
-                  border: Border.all(color: Colors.white, width: 2)),
-              child: ClipOval(
-                child: Image.network(
-                  _userInfo['icon'],
-                  width: 66,
-                  height: 66,
-                ),
-              ),
-            ),
-          )
+          _type == 'userInfo' ? _renderUserHeader() : _renderTagInfoHeader(),
+          _type == 'userInfo'
+              ? Positioned(
+                  top: 132,
+                  left: 10,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white70,
+                        borderRadius: BorderRadius.all(Radius.circular(35)),
+                        border: Border.all(color: Colors.white, width: 2)),
+                    child: ClipOval(
+                      child: Image.network(
+                        _userInfo['icon'],
+                        width: 66,
+                        height: 66,
+                      ),
+                    ),
+                  ),
+                )
+              : Container()
         ],
       ),
+    );
+  }
+
+  Column _renderUserHeader() {
+    return Column(
+      children: <Widget>[
+        _renderBg(),
+        _renderAuthorInfo(),
+        _renderFollowerLayout()
+      ],
     );
   }
 
@@ -177,7 +261,9 @@ class _UserInfoPageState extends State<UserInfoPage>
         children: <Widget>[
           Text(count.toString(),
               style: TextStyle(
-                  fontSize: 17, color: Colors.black, fontFamily: 'FZLanTing')),
+                  fontSize: 17,
+                  color: Colors.black,
+                  fontFamily: ConsFonts.fzFont)),
           Text(label, style: TextStyle(fontSize: 11, color: Colors.grey))
         ],
       ),
@@ -190,8 +276,7 @@ class _UserInfoPageState extends State<UserInfoPage>
       child: Stack(
         children: <Widget>[
           Image.network(
-            _userInfo['cover'] ??
-                'http://img.kaiyanapp.com/0f69c8a80fe3c600a7eec35c69a7e9fc.jpeg?imageMogr2/quality/60/format/jpg',
+            _userInfo['cover'] ?? 'http://',
             fit: BoxFit.cover,
             width: MediaQuery.of(context).size.width,
             height: double.infinity,
@@ -218,13 +303,13 @@ class _UserInfoPageState extends State<UserInfoPage>
                             child: Text(
                           '主题徽章',
                           textAlign: TextAlign.center,
-                          style:
-                              TextStyle(fontSize: 12, fontFamily: 'FZLanTing'),
+                          style: TextStyle(
+                              fontSize: 12, fontFamily: ConsFonts.fzFont),
                         )),
                         Text(
                           _userInfo['medalsNum'].toString(),
-                          style:
-                              TextStyle(fontSize: 10, fontFamily: 'FZLanTing'),
+                          style: TextStyle(
+                              fontSize: 10, fontFamily: ConsFonts.fzFont),
                         ),
                       ],
                     ),
@@ -272,7 +357,7 @@ class _UserInfoPageState extends State<UserInfoPage>
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 15,
-                              fontFamily: 'FZLanTing'),
+                              fontFamily: ConsFonts.fzFont),
                         ),
                         Text(
                           _userInfo['brief'],
@@ -300,7 +385,7 @@ class _UserInfoPageState extends State<UserInfoPage>
             indicatorSize: TabBarIndicatorSize.label,
             labelColor: Colors.black,
             indicatorColor: Color(0xff000001),
-            tabs: tabList.tabList
+            tabs: _tabList.tabList
                 .map((tabInfo) => Tab(text: tabInfo.name))
                 .toList()));
   }
@@ -309,34 +394,32 @@ class _UserInfoPageState extends State<UserInfoPage>
     return new Container(
         padding: EdgeInsets.only(top: 110),
         child: new TabBarView(
-            children: tabList.tabList
-                .map((tabInfo) => CommunityItemPage(tabInfo.apiUrl))
+            children: _tabList.tabList
+                .map((tabInfo) =>
+                    CommonListPage(tabInfo.apiUrl, userLoadMore: false))
                 .toList()));
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     super.dispose();
   }
 
   _fetchTabList() async {
-    Map<String, String> params = new Map();
-    params['id'] = widget.id;
-    params['userType'] = widget.userType.toUpperCase();
-    await HttpController.getInstance().get(API.USER_TABS, (data) {
+    await HttpController.getInstance().get(widget.url, (data) {
       var tabInfo = data['tabInfo'];
-      _userInfo = data['pgcInfo'] == null ? data['userInfo'] : data['pgcInfo'];
+      _userInfo = data['pgcInfo'] == null ? data[_type] : data['pgcInfo'];
       if (tabInfo == null || tabInfo['tabList'] == null || _userInfo == null) {
         _status = LoadingStatus.error;
-        _errMsg = data['errorMessage'] ?? '加载出错了~';
       } else {
-        tabList = TabList.map(tabInfo['tabList']);
+        _tabList = TabList.map(tabInfo['tabList']);
         _status = LoadingStatus.success;
       }
       if (mounted) setState(() {});
     }, errorCallback: (error) {
       _status = LoadingStatus.success;
       if (mounted) setState(() {});
-    }, params: params);
+    }, params: widget.params);
   }
 }

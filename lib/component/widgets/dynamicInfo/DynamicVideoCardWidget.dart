@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_open/component/widgets/VideoSmallCardWidget.dart';
-import 'package:flutter_open/utils/ActionViewUtils.dart';
-import 'package:flutter_open/utils/StringUtil.dart';
-import 'AuthorInfoWidget.dart';
+import 'package:flutter_open/utils/DayFormat.dart';
+import '../AuthorInfoWidget.dart';
+import 'DynamicResourceTypeCard.dart';
+import '../image/CustomImage.dart';
 
 class DynamicVideoCardWidget extends StatelessWidget {
   final data;
@@ -14,16 +14,22 @@ class DynamicVideoCardWidget extends StatelessWidget {
     var user = data['user'];
     var simpleVideo = data['simpleVideo'];
     return new Container(
+      decoration: BoxDecoration(
+          border:
+              Border(bottom: BorderSide(color: Colors.grey[200], width: 1))),
+      margin: EdgeInsets.only(bottom: 20),
+      padding: EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Container(
             margin: EdgeInsets.only(right: 10),
             child: ClipOval(
-              child: Image.network(
+              child: CustomImage(
                 user['avatar'],
                 width: 40,
                 height: 40,
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -38,12 +44,10 @@ class DynamicVideoCardWidget extends StatelessWidget {
         child: Column(children: <Widget>[
       AuthorInfoWidget(
         name: user['nickname'],
-        desc: '关注：',
-        avatar: user['avatar'],
+        desc: data['text'],
         id: user['uid'].toString(),
         userType: user['userType'],
         rightBtnType: 'arrow',
-        showAvatar: false,
         isDark: true,
       ),
       _renderVideoCard(simpleVideo, context, user),
@@ -59,7 +63,7 @@ class DynamicVideoCardWidget extends StatelessWidget {
               new Padding(
                   padding: EdgeInsets.only(left: 30),
                   child: Text(
-                    StringUtil.formatMileToDate(miles: data['createDate']),
+                    TimelineUtil.format(data['createDate']),
                     style: TextStyle(color: Colors.grey),
                   )),
             ],
@@ -96,27 +100,8 @@ class DynamicVideoCardWidget extends StatelessWidget {
       decoration: BoxDecoration(
           color: Colors.grey[200],
           borderRadius: BorderRadius.all(Radius.circular(5))),
-      child: Column(
-        children: <Widget>[
-          VideoSmallCardWidget(
-            id: simpleVideo['id'],
-            cover: simpleVideo['cover']['feed'],
-            title: simpleVideo['title'],
-            duration: simpleVideo['duration'],
-            category: simpleVideo['category'],
-            onCoverTap: () {
-              ActionViewUtils.actionVideoPlayPage(context,
-                  desc: simpleVideo['description'],
-                  id: simpleVideo['id'],
-                  category: simpleVideo['category'],
-                  author: user,
-                  cover: simpleVideo['cover'],
-                  consumption: simpleVideo['consumption'],
-                  title: simpleVideo['title']);
-            },
-          )
-        ],
-      ),
+      child: DynamicResourceTypeCard(
+          user: data['user'], simpleVideo: data['simpleVideo']),
     );
   }
 }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'AuthorInfoWidget.dart';
+import '../AuthorInfoWidget.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
 import 'package:flutter_open/utils/StringUtil.dart';
+import '../image/CustomImage.dart';
+import 'package:flutter_open/utils/DayFormat.dart';
 
 class DynamicFollowCardWidget extends StatelessWidget {
   final data;
@@ -19,10 +21,11 @@ class DynamicFollowCardWidget extends StatelessWidget {
           Container(
             margin: EdgeInsets.only(right: 10),
             child: ClipOval(
-              child: Image.network(
+              child: CustomImage(
                 user['avatar'],
                 width: 40,
                 height: 40,
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -43,16 +46,14 @@ class DynamicFollowCardWidget extends StatelessWidget {
         children: <Widget>[
           AuthorInfoWidget(
             name: user['nickname'],
-            desc: '关注：',
-            avatar: user['avatar'],
+            desc: data['text'],
             id: user['uid'].toString(),
             userType: user['userType'],
             rightBtnType: 'arrow',
-            showAvatar: false,
             isDark: true,
           ),
           _renderCard(briefCard),
-          Text(StringUtil.formatMileToDate(miles: data['createDate']))
+          Text(TimelineUtil.format(data['createDate']))
         ],
       ),
     ));
@@ -60,7 +61,7 @@ class DynamicFollowCardWidget extends StatelessWidget {
 
   _renderCard(briefCard) {
     String type = briefCard['dataType'];
-    if (type == 'BriefCard') {
+    if (type == 'BriefCard' || type == 'TagBriefCard') {
       return _renderBriefCard(briefCard);
     } else {
       return Text(type);

@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
 import 'package:flutter_open/pages/WebViewPage.dart';
-
+import '../../pages/LightTopicPage.dart';
 class SingleBannerWidget extends StatelessWidget {
-  final String imageUrl;
+  final   data;
   final double height;
-  final String actionUrl;
 
-  SingleBannerWidget(this.imageUrl, {this.height = 180, this.actionUrl});
+  SingleBannerWidget(this.data, {this.height = 180});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context)
-            .push(new MaterialPageRoute(builder: (BuildContext context) {
-          return WebViewPage();
-        }));
+        String actionUrl = data['actionUrl'];
+        if(actionUrl.startsWith('eyepetizer://lightTopic/detail')){
+              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){
+                return LightTopicPage(topicId:data['id'] ,title:data['title'] ,);
+              }));
+        }else{
+          Navigator.of(context)
+              .push(new MaterialPageRoute(builder: (BuildContext context) {
+            return WebViewPage();
+          }));
+        }
       },
       child: new Container(
           margin: EdgeInsets.only(bottom: 5, top: 5),
@@ -29,7 +35,7 @@ class SingleBannerWidget extends StatelessWidget {
           child: ClipRRect(
             borderRadius: BorderRadius.all(Radius.circular(5)),
             child: Image.network(
-              imageUrl,
+              data['image'],
               fit: BoxFit.fill,
               width: double.infinity,
             ),

@@ -6,7 +6,9 @@ import 'package:video_player/video_player.dart';
 import 'package:flutter_open/component/widgets/AuthorInfoWidget.dart';
 import 'package:flutter_open/component/widgets/TheEndWidget.dart';
 import 'package:flutter_open/api/API.dart';
+import 'package:flutter_open/component/widgets/AnimationTextWidget.dart';
 import 'dart:io';
+import 'package:flutter_open/component/widgets/VideoSmallCardWidget.dart';
 
 class VideoPlayPage extends StatefulWidget {
   final consumption;
@@ -83,7 +85,18 @@ class VideoPlayState extends State<VideoPlayPage> {
                 } else if (index == _itemList.length - 1) {
                   return TheEndWidget();
                 } else if (type == 'videoSmallCard') {
-                  return _renderVideoCard(context, _item);
+                  return Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: VideoSmallCardWidget(
+                        cover: _item['cover']['feed'],
+                        title: _item['title'],
+                        onCoverTap: () {
+                          _onItemTap(_item);
+                        },
+                        category: '${_item['category']} / 开眼精选',
+                        duration: _item['duration'],
+                        isDarkTheme: false),
+                  );
                 }
               }),
         ),
@@ -113,34 +126,30 @@ class VideoPlayState extends State<VideoPlayPage> {
         children: <Widget>[
           Offstage(
             offstage: _title == '',
-            child: new Text(
+            child: new AnimationTextWidget(
               _title,
               style: TextStyle(
                   fontSize: 16, color: Colors.white, fontFamily: 'FZLanTing'),
-              overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
           ),
           new Padding(
             padding: EdgeInsets.only(top: 8),
-            child: new Text(
+            child: new AnimationTextWidget(
               _category == null ? '#开眼推荐' : '#$_category / 开眼推荐',
               style: TextStyle(
                   fontSize: 13, color: Colors.white70, fontFamily: 'FZLanTing'),
-              overflow: TextOverflow.ellipsis,
               maxLines: 1,
             ),
           ),
           new Padding(
               padding: EdgeInsets.only(top: 8, bottom: 15),
-              child: new Text(
+              child: new AnimationTextWidget(
                 _desc,
                 style: TextStyle(
                     fontSize: 12,
                     color: Colors.white70,
                     fontFamily: 'FZLanTing'),
-                maxLines: 4,
-                overflow: TextOverflow.ellipsis,
               )),
           new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -236,6 +245,9 @@ class VideoPlayState extends State<VideoPlayPage> {
   }
 
   renderAuthorInfo() {
+    if (_author == null) {
+      return new Container();
+    }
     String name = _author['name'] ?? _author['nickname'];
     String desc = _author['description'];
     String avatar = _author['icon'] ?? _author['avatar'];
@@ -252,82 +264,6 @@ class VideoPlayState extends State<VideoPlayPage> {
         rightBtnType: 'follow',
       ),
     );
-  }
-
-  _renderVideoCard(context, _item) {
-    return new GestureDetector(
-      onTap: () {
-        _onItemTap(_item);
-      },
-      child: new Container(
-        margin: EdgeInsets.fromLTRB(10, 7, 5, 7),
-        height: 90,
-        child: new Row(
-          children: <Widget>[
-            new Stack(
-              children: <Widget>[
-                new ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(3)),
-                  child: new Image.network(
-                    _item['cover']['feed'],
-                    width: 160,
-                    height: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                _buildDuration(_item['duration']),
-              ],
-            ),
-            new Expanded(
-                child: new Container(
-              padding: EdgeInsets.only(left: 10, top: 10, bottom: 10),
-              child: new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  new Text(
-                    _item['title'],
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontFamily: 'FZLanTing'),
-                  ),
-                  new Text(
-                    '#${_item['category']} / 开眼精选',
-                    style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                        fontFamily: 'FZLanTing'),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ))
-          ],
-        ),
-      ),
-    );
-  }
-
-  _buildDuration(int duration) {
-    return new Positioned(
-        right: 5,
-        bottom: 5,
-        child: new Container(
-          padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(3)),
-            color: Color.fromRGBO(0, 0, 0, 0.6),
-          ),
-          child: Text(
-            StringUtil.formatDuration(duration),
-            style: TextStyle(
-                color: Colors.white, fontSize: 12, fontFamily: 'FZLanTing'),
-          ),
-        ));
   }
 
   _onItemTap(_item) {
