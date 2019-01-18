@@ -85,16 +85,16 @@ class _SearchPageState extends State<SearchPage> {
     List<TextSpan> textSpans = _buildTextSpans(item, query);
     return textSpans.length > 0
         ? GestureDetector(
-            onTap: () {
-              _onSubmitted(context, SearchEntity(item));
-            },
-            child: Container(
-                padding: EdgeInsets.all(10),
-                child: RichText(
-                  overflow: TextOverflow.ellipsis,
-                  text: TextSpan(children: textSpans),
-                )),
-          )
+      onTap: () {
+        _onSubmitted(context, SearchEntity(item));
+      },
+      child: Container(
+          padding: EdgeInsets.all(10),
+          child: RichText(
+            overflow: TextOverflow.ellipsis,
+            text: TextSpan(children: textSpans),
+          )),
+    )
         : new Container();
   }
 
@@ -208,7 +208,13 @@ class _SearchPageState extends State<SearchPage> {
   _onSubmitted(BuildContext context, SearchEntity item) {
     _editingController.text = item.name;
     _type = 'search';
-    List<SearchEntity> hisList = _hotAndHisList.sublist(1, _historyLength + 2);
+    List<SearchEntity> hisList;
+    if (_hotAndHisList.length > _historyLength + 1) {
+      hisList = _hotAndHisList.sublist(1, _historyLength + 2);
+    } else {
+      hisList = _hotAndHisList.sublist(1, _historyLength + 1);
+    }
+
     bool notExist = true;
     for (var i = 0; i < hisList.length; i++) {
       if (hisList[i].name == item.name) {
@@ -269,13 +275,13 @@ class _SearchPageState extends State<SearchPage> {
                 },
                 child: isHisItem
                     ? Container(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Icon(
-                          Icons.delete,
-                          size: 20,
-                          color: Colors.grey,
-                        ),
-                      )
+                  padding: EdgeInsets.only(left: 10),
+                  child: Icon(
+                    Icons.delete,
+                    size: 20,
+                    color: Colors.grey,
+                  ),
+                )
                     : new Container(),
               )
             ],

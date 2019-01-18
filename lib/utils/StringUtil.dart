@@ -50,7 +50,19 @@ class StringUtil {
   static String getTagIdFromActionUrl(String actionUrl) {
     if (actionUrl == null) return '';
     List<String> strings = actionUrl.split('/');
-    String tagId = strings[3];
-    return tagId;
+    String tagString = strings[3];
+    String tagId;
+    if(tagString.contains('?')){
+      List<String> strs = tagString.split('?');
+      tagId = strs[0];
+      return tagId;
+    }
+    return tagString;
+  }
+
+  static String getValueFromActionUrl(String actionUrl, String key) {
+    Map<String, String> params = new Map();
+    params = getParamsFromUrl(actionUrl);
+    return Uri.decodeFull(params[key]);
   }
 }

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
 import 'package:flutter_open/pages/WebViewPage.dart';
 import '../../pages/LightTopicPage.dart';
+import '../../utils/StringUtil.dart';
+
 class SingleBannerWidget extends StatelessWidget {
-  final   data;
+  final data;
   final double height;
 
   SingleBannerWidget(this.data, {this.height = 180});
@@ -13,15 +15,23 @@ class SingleBannerWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         String actionUrl = data['actionUrl'];
-        if(actionUrl.startsWith('eyepetizer://lightTopic/detail')){
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){
-                return LightTopicPage(topicId:data['id'] ,title:data['title'] ,);
-              }));
-        }else{
+        if (actionUrl.startsWith('eyepetizer://lightTopic/detail')) {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (BuildContext context) {
+            return LightTopicPage(
+              topicId: data['id'],
+              title: data['title'],
+            );
+          }));
+        } else if (actionUrl.startsWith('eyepetizer://webview')) {
           Navigator.of(context)
               .push(new MaterialPageRoute(builder: (BuildContext context) {
-            return WebViewPage();
+            String url = Uri.decodeFull(
+                StringUtil.getValueFromActionUrl(actionUrl, 'url'));
+            return WebViewPage(url: url, title: data['title']);
           }));
+        } else {
+          print('--->    $actionUrl');
         }
       },
       child: new Container(

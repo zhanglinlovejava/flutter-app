@@ -3,6 +3,7 @@ import 'package:flutter_open/component/BaseAliveState.dart';
 import 'package:flutter_open/pages/CommonListPage.dart';
 import 'package:flutter_open/api/API.dart';
 import '../Constants.dart';
+import '../utils/Tools.dart';
 class NotificationPage extends StatefulWidget {
   @override
   _NotificationPageState createState() {
@@ -23,16 +24,16 @@ class _NotificationPageState extends BaseAliveSate<NotificationPage>
   @override
   Widget build(BuildContext context) {
     return new Container(
-        margin: EdgeInsets.only(top: 20),
+        margin: EdgeInsets.only(top:Tools.getStatusHeight(context)),
         child: Column(
           children: <Widget>[
             Container(
               alignment: Alignment.center,
-              height: 30,
+              padding: EdgeInsets.only(top: 5,bottom: 5),
               child: Text(
                 'Notification',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black, fontFamily: ConsFonts.lobFont),
+                style: TextStyle(color: Colors.black, fontFamily: ConsFonts.lobFont,fontSize: 18),
               ),
             ),
             Container(

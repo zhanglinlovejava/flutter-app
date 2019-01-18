@@ -14,6 +14,7 @@ class API {
 
 //个人信息
   static final String USER_TABS = 'v5/userInfo/tab'; //个人 tab list //id, userType
+  static final String ALL_PGC = 'v4/pgcs/all'; //全部作者
 //搜索
   static final String SEARCH = 'v3/search'; //search //query
   static final String SEARCH_HOT = 'v3/queries/hot'; //hot
@@ -30,6 +31,15 @@ class API {
 //专题
   static final String SPECIAL_TOPIC_ALL = 'v3/specialTopics'; //专题
   static final String LIGHT_TOPIC_ALL = 'v3/lightTopics/internal'; //专题  /407
+
+
+  static final String RANK_LIST = 'v4/rankList'; //排行榜 tab
+  static final String MESSAGE_TAB = 'v3/messages/tabList'; //消息tab
+  static final String VIDEO_DETAIL = 'v2/video'; //视频详情  /147228
+
+
+
+
 
 
 }

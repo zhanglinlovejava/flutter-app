@@ -13,9 +13,13 @@ class SquareCardCollectionWidget extends StatelessWidget {
   final showBottomAvatar;
   double height = 190;
   final VoidCallback onRightTap;
+  final VoidCallback onTitleTap;
 
   SquareCardCollectionWidget(this.data,
-      {this.showTopView = true, this.showBottomAvatar = true, this.onRightTap});
+      {this.showTopView = true,
+      this.showBottomAvatar = true,
+      this.onRightTap,
+      this.onTitleTap});
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +69,13 @@ class SquareCardCollectionWidget extends StatelessWidget {
       title: data['header']['title'],
       rightBtnText: data['header']['rightText'],
       onRightBtnTap: () {
-        if (onRightTap is VoidCallback) {
+        if (onRightTap != null) {
           onRightTap();
+        }
+      },
+      onTitleTap: () {
+        if (onTitleTap != null) {
+          onTitleTap();
         }
       },
       align: MainAxisAlignment.spaceBetween,
@@ -98,14 +107,7 @@ class SquareCardCollectionWidget extends StatelessWidget {
                   id: _data['author']['id'].toString(),
                   userType: 'PGC',
                   onCoverTap: () {
-                    ActionViewUtils.actionVideoPlayPage(context,
-                        desc: _data['description'],
-                        id: _data['id'],
-                        category: _data['category'],
-                        author: _data['author'],
-                        cover: _data['cover'],
-                        consumption: _data['consumption'],
-                        title: _data['title']);
+                    ActionViewUtils.actionVideoPlayPage(context, _data['id']);
                   },
                 ),
               );
@@ -132,14 +134,7 @@ class SquareCardCollectionWidget extends StatelessWidget {
                     userType: 'PGC',
                     showBottomAvatar: false,
                     onCoverTap: () {
-                      ActionViewUtils.actionVideoPlayPage(context,
-                          desc: item['description'],
-                          id: item['id'],
-                          category: item['category'],
-                          author: item['author'],
-                          cover: item['cover'],
-                          consumption: item['consumption'],
-                          title: item['title']);
+                      ActionViewUtils.actionVideoPlayPage(context, item['id']);
                     }),
               );
             } else if (type == 'squareCardOfCategory') {

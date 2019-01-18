@@ -5,11 +5,9 @@ import 'package:flutter_open/pages/SplashPage.dart';
 
 void main() {
   runApp(MyApp());
-  if (Platform.isAndroid) {
     SystemUiOverlayStyle systemUiOverlayStyle =
         SystemUiOverlayStyle(statusBarColor: Colors.black,statusBarBrightness: Brightness.dark);
     SystemChrome.setSystemUIOverlayStyle(systemUiOverlayStyle);
-  }
 }
 
 class MyApp extends StatelessWidget {
@@ -19,6 +17,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.black,
+        platform: TargetPlatform.iOS
       ),
       home: SplashPage(),
     );

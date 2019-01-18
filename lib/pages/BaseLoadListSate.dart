@@ -58,7 +58,7 @@ abstract class BaseLoadListSate<T extends StatefulWidget>
         height: double.infinity,
         color: Colors.white,
         width: double.infinity,
-        padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
         child: new LoadingView(
           status: status,
           loadingContent:
@@ -125,11 +125,11 @@ abstract class BaseLoadListSate<T extends StatefulWidget>
           return;
         }
         start += num;
-        if (!isLoadMore) {
-          itemList = temList;
-        } else {
-          itemList.addAll(temList);
-        }
+        temList.forEach((item) {
+          if (item != null) {
+            itemList.add(item);
+          }
+        });
         if (!registerScrollController()) {
           itemList.add(itemList[0]);
         }

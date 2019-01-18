@@ -25,14 +25,7 @@ class DynamicResourceTypeCard extends StatelessWidget {
         if (simpleVideo['onlineStatus'] == 'OFFLINE') {
           return;
         }
-        ActionViewUtils.actionVideoPlayPage(context,
-            desc: simpleVideo['description'],
-            id: simpleVideo['id'],
-            category: simpleVideo['category'],
-            author: user,
-            cover: simpleVideo['cover'],
-            consumption: simpleVideo['consumption'],
-            title: simpleVideo['title']);
+        ActionViewUtils.actionVideoPlayPage(context, simpleVideo['id']);
       },
     );
   }

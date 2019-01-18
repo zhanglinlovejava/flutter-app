@@ -10,10 +10,10 @@ import 'package:flutter_open/entity/TabList.dart';
 import 'dart:io';
 import '../component/widgets/FollowBtnWidget.dart';
 import '../Constants.dart';
+import '../component/widgets/image/CustomImage.dart';
 
 const double tabBarHeight = 40;
-double userInfoHeight = Platform.isIOS ? 356 : 336;
-double tagInfoHeight = Platform.isIOS ? 240 : 220;
+const double userDescHeight = 40;
 
 class StickyHeaderTabPage extends StatefulWidget {
   final Map<String, String> params;
@@ -29,6 +29,8 @@ class StickyHeaderTabPage extends StatefulWidget {
 
 class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
     with SingleTickerProviderStateMixin {
+  double userInfoHeight = Platform.isIOS ? 356 : 336;
+  double tagInfoHeight = Platform.isIOS ? 240 : 220;
   double _expandedHeight;
   LoadingStatus _status = LoadingStatus.loading;
   ScrollController _scrollController = ScrollController();
@@ -38,11 +40,18 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
   TabList _tabList;
   String _type;
   var _userInfo;
+  bool _isPgc = false;
+  String _userType;
 
   @override
   void initState() {
     super.initState();
+    _userType = widget.params['userType'];
     _type = widget.type;
+    _isPgc = _userType == 'PGC';
+    if (_isPgc) {
+      userInfoHeight = userInfoHeight + userDescHeight;
+    }
     _expandedHeight = _type == 'userInfo' ? userInfoHeight : tagInfoHeight;
     _scrollController.addListener(() {
       _opacity = _scrollController.offset / _scrollMaxHeight;
@@ -61,6 +70,8 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
           status: _status,
           loadingContent: PlatformAdaptiveProgressIndicator(strokeWidth: 2),
           errorContent: LoadErrorWidget(onRetryFunc: () {
+            _status = LoadingStatus.loading;
+            setState(() {});
             _fetchTabList();
           }),
           successContent: _tabList == null ||
@@ -88,6 +99,7 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
       new SliverOverlapAbsorber(
         handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
         child: new SliverAppBar(
+          actions: _renderAppBarActions(),
           titleSpacing: 0,
           title: Text(
             _userInfo['name'],
@@ -122,6 +134,27 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
     ];
   }
 
+  _renderAppBarActions() {
+    List<Widget> list = [];
+    if (_isPgc) {
+      list.add(GestureDetector(
+          onTap: () {
+            print('分享');
+          },
+          child: Container(
+              padding: EdgeInsets.only(left: 15,right: 10),
+              child: Icon(Icons.share, color: _titleColor, size: 20))));
+      list.add(GestureDetector(
+          onTap: () {
+            print('更多操作');
+          },
+          child: Container(
+            padding: EdgeInsets.only(left: 10,right: 15),
+              child: Icon(Icons.more_vert, color: _titleColor, size: 25))));
+    }
+    return list;
+  }
+
   _renderTagInfoHeader() {
     return Container(
       height: _expandedHeight,
@@ -131,11 +164,12 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
           Container(
             foregroundDecoration:
                 BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.4)),
-            child: Image.network(
+            child: CustomImage(
               _userInfo['headerImage'] ?? _userInfo['bgPicture'],
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
+              placeHolePath: 'asset/images/user_default_bg.jpg',
             ),
           ),
           Positioned(
@@ -234,9 +268,24 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
       children: <Widget>[
         _renderBg(),
         _renderAuthorInfo(),
+        _renderDesc(),
         _renderFollowerLayout()
       ],
     );
+  }
+
+  _renderDesc() {
+    return _isPgc
+        ? Container(
+            padding: EdgeInsets.only(left: 10),
+            alignment: Alignment.topLeft,
+            height: userDescHeight,
+            child: Text(
+              _userInfo['description'],
+              style:
+                  TextStyle(color: Colors.grey, fontFamily: ConsFonts.fzFont),
+            ))
+        : Container();
   }
 
   _renderFollowerLayout() {
@@ -275,11 +324,12 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
       height: 190,
       child: Stack(
         children: <Widget>[
-          Image.network(
+          CustomImage(
             _userInfo['cover'] ?? 'http://',
             fit: BoxFit.cover,
             width: MediaQuery.of(context).size.width,
             height: double.infinity,
+            placeHolePath: 'asset/images/user_default_bg.jpg',
           ),
           Positioned(
               right: 10,
@@ -417,8 +467,8 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
         _status = LoadingStatus.success;
       }
       if (mounted) setState(() {});
-    }, errorCallback: (error) {
-      _status = LoadingStatus.success;
+    }, errorCallback: (_) {
+      _status = LoadingStatus.error;
       if (mounted) setState(() {});
     }, params: widget.params);
   }

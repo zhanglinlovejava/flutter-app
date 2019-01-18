@@ -19,24 +19,32 @@ class AnimationTextWidget extends StatefulWidget {
 
 class _AnimationTextWidget extends State<AnimationTextWidget>
     with SingleTickerProviderStateMixin {
+  String _text;
   String _showText = '';
   String _hideText = '';
   AnimationController _animationController;
   Animation<int> _animation;
+  VoidCallback listener;
 
   @override
   void initState() {
     super.initState();
+    listener = () {
+      setState(() {
+        _showText = _text.substring(0, _animation.value);
+        _hideText = _text.substring(_animation.value, _text.length);
+      });
+    };
+    _text = widget.text;
     _animationController = new AnimationController(
         vsync: this, duration: Duration(milliseconds: widget.miles));
-    _animation = IntTween(begin: 0, end: widget.text.length).animate(
+    _initAnimation();
+  }
+
+  void _initAnimation() {
+    _animation = IntTween(begin: 0, end: _text.length).animate(
         CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
-    _animation.addListener(() {
-      setState(() {
-        _showText = widget.text.substring(0, _animation.value);
-        _hideText = widget.text.substring(_animation.value, widget.text.length);
-      });
-    });
+    _animation.addListener(listener);
     Future.delayed(Duration(milliseconds: widget.delay), () {
       _animationController.forward(from: 0.0);
     });
@@ -54,5 +62,15 @@ class _AnimationTextWidget extends State<AnimationTextWidget>
             style: widget.style.copyWith(color: Colors.transparent))
       ]),
     );
+  }
+
+  @override
+  void didUpdateWidget(AnimationTextWidget oldWidget) {
+    if (widget.text != _text) {
+      _text = widget.text;
+      setState(() {});
+      _initAnimation();
+    }
+    super.didUpdateWidget(oldWidget);
   }
 }

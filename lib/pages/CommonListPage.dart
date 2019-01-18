@@ -15,6 +15,8 @@ import 'package:flutter_open/component/widgets/SingleBannerWidget.dart';
 import 'package:flutter_open/component/widgets/MessageItemWidget.dart';
 import 'package:flutter_open/api/API.dart';
 import '../component/widgets/BriefCardWidget.dart';
+import 'RankListPage.dart';
+import '../utils/StringUtil.dart';
 
 class CommonListPage extends StatefulWidget {
   final String url;
@@ -37,11 +39,9 @@ class CommonListPage extends StatefulWidget {
 class _CommonListPageState extends BaseLoadListSate<CommonListPage> {
   _renderItemRow(int index, BuildContext context) {
     if (widget.type == 'common') {
-      return Container(
-        child: _renderCommonItem(index, context),
-      );
+      return _renderCommonItem(index, context);
     } else if (widget.type == 'message') {
-      return MEssageItemWidget(itemList[index]);
+      return MessageItemWidget(itemList[index]);
     }
   }
 
@@ -56,20 +56,11 @@ class _CommonListPageState extends BaseLoadListSate<CommonListPage> {
           margin: EdgeInsets.only(top: 10), child: SingleBannerWidget(data));
     } else if (type == 'squareCardCollection' ||
         type == 'videoCollectionOfHorizontalScrollCard') {
-      return SquareCardCollectionWidget(data, onRightTap: () {
-        String actionUrl = data['header']['actionUrl'];
-        if (actionUrl.startsWith('eyepetizer://homepage/selected')) {
-          if (widget.changeTab != null) widget.changeTab(3);
-        } else if (actionUrl.startsWith('eyepetizer://categories/all')) {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (BuildContext context) {
-            return CommonListPage(API.CATEGORY_ALL,
-                title: '全部分类', userLoadMore: false);
-          }));
-        }
-      });
+      return _renderSquareCardCollectionWidget(data, context);
     } else if (type == 'squareCard' || type == 'rectangleCard') {
       return _renderBriefCard(data, context);
+    } else if (type == 'blankCard') {
+      return SizedBox(height: 15);
     } else if (type == 'followCard') {
       return _renderFollowCard(data, context);
     } else if (type == 'pictureFollowCard') {
@@ -93,6 +84,40 @@ class _CommonListPageState extends BaseLoadListSate<CommonListPage> {
     }
   }
 
+  SquareCardCollectionWidget _renderSquareCardCollectionWidget(
+      data, BuildContext context) {
+    return SquareCardCollectionWidget(data, onRightTap: () {
+      String actionUrl = data['header']['actionUrl'];
+      if (actionUrl.startsWith('eyepetizer://homepage/selected')) {
+        if (widget.changeTab != null) widget.changeTab(3);
+      } else if (actionUrl.startsWith('eyepetizer://categories/all')) {
+        _actionHotCategory(context);
+      } else {
+        print('-SquareCardCollectionWidget--$actionUrl');
+      }
+    }, onTitleTap: () {
+      String actionUrl = data['header']['actionUrl'];
+      if (actionUrl.startsWith('eyepetizer://campaign/list')) {
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (BuildContext context) {
+          return CommonListPage(API.SPECIAL_TOPIC_ALL, title: '专题');
+        }));
+      } else if (actionUrl.startsWith('eyepetizer://categories/all')) {
+        _actionHotCategory(context);
+      } else {
+        print('-SquareCardCollectionWidget--$actionUrl');
+      }
+    });
+  }
+
+  void _actionHotCategory(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      return CommonListPage(API.CATEGORY_ALL,
+          title: '全部分类', userLoadMore: false);
+    }));
+  }
+
   _renderBriefCard(data, BuildContext context) {
     return BriefCardWidget(
         icon: data['image'],
@@ -114,7 +139,7 @@ class _CommonListPageState extends BaseLoadListSate<CommonListPage> {
                 API.CATEGORY_INFO_TAB, context, actionUrl,
                 type: 'categoryInfo');
           } else if (actionUrl.startsWith('eyepetizer://ranklist')) {
-            //TODO 跳转至 全部排行
+            _actionToRankList();
           }
         });
   }
@@ -138,33 +163,46 @@ class _CommonListPageState extends BaseLoadListSate<CommonListPage> {
 
   _renderTextCard(data) {
     String type = data['type'];
-    if (type == 'header5' || type == 'header2') {
-      return TextCardWidget(
-          title: data['text'],
-          onTitleTap: () {
-            String actionUrl = data['actionUrl'];
-            if (actionUrl.startsWith('eyepetizer://tag')) {
-              ActionViewUtils.actionTagInfoPage(
-                  API.TAG_INFO_TAB, context, actionUrl,
-                  type: 'tagInfo');
-            } else if (actionUrl.startsWith('eyepetizer://ranklist')) {
-              print('go to rankList');
-            } else {
-              print('  ------$actionUrl');
-            }
-          });
+    if (type == 'header5' || type == 'header2' || type == 'header4') {
+      String actionUrl = data['actionUrl'];
+      if (actionUrl == null) {
+        return TextCardWidget(title: data['text'], showTitleArrow: false);
+      } else {
+        return TextCardWidget(
+            title: data['text'],
+            onTitleTap: () {
+              if (actionUrl.startsWith('eyepetizer://tag')) {
+                ActionViewUtils.actionTagInfoPage(
+                    API.TAG_INFO_TAB, context, actionUrl,
+                    type: 'tagInfo');
+              } else if (actionUrl.startsWith('eyepetizer://ranklist')) {
+                _actionToRankList();
+              } else if (actionUrl.startsWith('eyepetizer://common')) {
+                _actionMoreRecommendPage(actionUrl);
+              } else {
+                print('  ------$actionUrl');
+              }
+            });
+      }
     } else if (type == 'footer3' || type == 'footer2' || type == 'footer1') {
       return TextCardWidget(
         rightBtnText: data['text'],
         align: MainAxisAlignment.end,
         onRightBtnTap: () {
-          String actionUrl = data['actionUrl'];
+          String actionUrl = data['actionUrl'] ?? '';
           if (actionUrl.startsWith('eyepetizer://tag')) {
             ActionViewUtils.actionTagInfoPage(
                 API.TAG_INFO_TAB, context, actionUrl,
                 type: 'tagInfo');
           } else if (actionUrl.startsWith('eyepetizer://ranklist')) {
-            print('go to rankList');
+            _actionToRankList();
+          } else if (actionUrl.startsWith('eyepetizer://common')) {
+            _actionMoreRecommendPage(actionUrl);
+          } else if (actionUrl.startsWith('eyepetizer://pgcs/all')) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (BuildContext context) {
+              return CommonListPage(API.ALL_PGC, title: '全部作者');
+            }));
           } else {
             print('  ------$actionUrl');
           }
@@ -175,6 +213,21 @@ class _CommonListPageState extends BaseLoadListSate<CommonListPage> {
     }
   }
 
+  void _actionToRankList() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      return RankListPage(API.RANK_LIST, title: 'eyepetizer');
+    }));
+  }
+
+  void _actionMoreRecommendPage(String actionUrl) {
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+      String url = StringUtil.getValueFromActionUrl(actionUrl, 'url');
+      String title = StringUtil.getValueFromActionUrl(actionUrl, 'title');
+      return CommonListPage(url, title: title ?? '猜你喜欢');
+    }));
+  }
+
   VideoSmallCardWidget _renderVideoSmallCard(data, BuildContext context) {
     return VideoSmallCardWidget(
       id: data['id'],
@@ -183,14 +236,7 @@ class _CommonListPageState extends BaseLoadListSate<CommonListPage> {
       duration: data['duration'],
       category: data['category'],
       onCoverTap: () {
-        ActionViewUtils.actionVideoPlayPage(context,
-            desc: data['description'],
-            id: data['id'],
-            category: data['category'],
-            author: data['author'],
-            cover: data['cover'],
-            consumption: data['consumption'],
-            title: data['title']);
+        ActionViewUtils.actionVideoPlayPage(context, data['id']);
       },
     );
   }
@@ -208,14 +254,7 @@ class _CommonListPageState extends BaseLoadListSate<CommonListPage> {
           userType: 'PGC',
           duration: _data['duration'],
           onCoverTap: () {
-            ActionViewUtils.actionVideoPlayPage(context,
-                desc: _data['description'],
-                id: _data['id'],
-                category: _data['category'],
-                author: _data['author'],
-                cover: _data['cover'],
-                consumption: _data['consumption'],
-                title: _data['title']);
+            ActionViewUtils.actionVideoPlayPage(context, _data['id']);
           },
         ));
   }
@@ -241,14 +280,6 @@ class _CommonListPageState extends BaseLoadListSate<CommonListPage> {
 
   @override
   Widget getAppBar() {
-    if (widget.title == '') {
-      return null;
-    } else {
-      return AppBar(
-          backgroundColor: Colors.white,
-          iconTheme: IconThemeData(color: Colors.black),
-          title: Text(widget.title, style: TextStyle(color: Colors.black)),
-          centerTitle: true);
-    }
+    return ActionViewUtils.buildAppBar(title: widget.title);
   }
 }

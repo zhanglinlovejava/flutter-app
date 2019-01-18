@@ -7,9 +7,11 @@ class TextCardWidget extends StatelessWidget {
   final MainAxisAlignment align;
   final VoidCallback onRightBtnTap;
   final VoidCallback onTitleTap;
+  final bool showTitleArrow;
 
   TextCardWidget(
       {this.title = '',
+      this.showTitleArrow = true,
       this.rightBtnText = '',
       this.align = MainAxisAlignment.start,
       this.onRightBtnTap,
@@ -36,7 +38,7 @@ class TextCardWidget extends StatelessWidget {
                       style:
                           TextStyle(fontSize: 20, fontFamily: ConsFonts.fzFont),
                     ),
-              rightBtnText == '' || rightBtnText == null
+              showTitleArrow && (title != '' && title != null)
                   ? new Padding(
                       padding: EdgeInsets.only(left: 5),
                       child: Image(

@@ -9,6 +9,7 @@ import '../component/widgets/LoadEmptyWidget.dart';
 import '../component/widgets/LoadErrorWidget.dart';
 import '../component/widgets/AutoPlayFollowCardWidget.dart';
 import '../component/widgets/TheEndWidget.dart';
+import '../utils/ActionViewUtils.dart';
 
 class LightTopicPage extends StatefulWidget {
   final String title;
@@ -35,28 +36,21 @@ class _LightTopicPageState extends State<LightTopicPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(widget.title, style: TextStyle(color: Colors.black)),
-        iconTheme: IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        actions: <Widget>[
-          GestureDetector(
-            onTap: () {
-            },
-            child: Padding(
-                padding: EdgeInsets.only(left: 10, right: 10),
-                child: Icon(Icons.favorite_border, size: 25)),
-          ),
-          GestureDetector(
-            onTap: () {
-            },
-            child: Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: Icon(Icons.file_download, size: 25)),
-          ),
-        ],
-      ),
+      appBar:
+          ActionViewUtils.buildAppBar(title: widget.title, actions: <Widget>[
+        GestureDetector(
+          onTap: () {},
+          child: Padding(
+              padding: EdgeInsets.only(left: 10, right: 10),
+              child: Icon(Icons.favorite_border, size: 25)),
+        ),
+        GestureDetector(
+          onTap: () {},
+          child: Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(Icons.file_download, size: 25)),
+        ),
+      ]),
       body: Center(
           child: LoadingView(
               status: _status,

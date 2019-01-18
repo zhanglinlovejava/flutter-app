@@ -9,6 +9,7 @@ import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
 import 'package:flutter_open/component/BaseAliveState.dart';
 import 'package:flutter_open/api/API.dart';
 import 'SearchPage.dart';
+import '../utils/ActionViewUtils.dart';
 
 class HomePage extends StatefulWidget {
   final TabList homeTabList;
@@ -24,8 +25,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends BaseAliveSate<HomePage>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
-  List<Tab> tabs = <Tab>[];
-  List<int> ids = [];
+  List<Tab> _tabs = <Tab>[];
   LoadingStatus _status = LoadingStatus.loading;
 
   @override
@@ -49,16 +49,11 @@ class _HomePageState extends BaseAliveSate<HomePage>
           successContent: new Column(
             children: <Widget>[
               _buildTabBar(),
-              _tabController == null
-                  ? new Container(
-                      width: MediaQuery.of(context).size.width - 100,
-                      color: Colors.transparent,
-                    )
-                  : Expanded(
-                      child: TabBarView(
-                      controller: _tabController,
-                      children: _buildTabPage(),
-                    ))
+              Expanded(
+                  child: TabBarView(
+                controller: _tabController,
+                children: _buildTabPage(),
+              ))
             ],
           ),
         ));
@@ -66,9 +61,7 @@ class _HomePageState extends BaseAliveSate<HomePage>
 
   _buildTabBar() {
     return new Container(
-      decoration: BoxDecoration(
-          border:
-              Border(bottom: BorderSide(color: Colors.grey[200], width: 1))),
+      decoration: ActionViewUtils.renderBorderBottom(),
       padding: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 5),
       child: new Row(
         children: <Widget>[
@@ -90,7 +83,7 @@ class _HomePageState extends BaseAliveSate<HomePage>
                       child: TabBar(
                           labelStyle:
                               TextStyle(fontFamily: 'FZLanTing', fontSize: 13),
-                          tabs: tabs,
+                          tabs: _tabs,
                           labelPadding: EdgeInsets.only(left: 15, right: 15),
                           isScrollable: true,
                           labelColor: Colors.black,
@@ -122,15 +115,15 @@ class _HomePageState extends BaseAliveSate<HomePage>
 
   List<Widget> _buildTabPage() {
     List<Widget> list = [];
-    tabs.forEach((tab) {
+    _tabs.forEach((tab) {
       List<String> strings = tab.key.toString().split("'");
       int id = int.parse(strings[1]);
       if (id > 0) {
         list.add(CommonListPage('${API.CATEGORY_LIST}/$id'));
       } else if (id == -1) {
-        list.add(CommonListPage(API.DISCOVERY_LIST));
+        list.add(CommonListPage(API.DISCOVERY_LIST, userLoadMore: false));
       } else if (id == -2) {
-        list.add(CommonListPage(API.RECOMMEND_LIST,changeTab: _scrollToTap));
+        list.add(CommonListPage(API.RECOMMEND_LIST, changeTab: _scrollToTap));
       } else if (id == -3) {
         list.add(CommonListPage(API.DAILY_LIST));
       } else if (id == -5) {
@@ -161,19 +154,25 @@ class _HomePageState extends BaseAliveSate<HomePage>
 
   void initTabBar(TabList tabList) {
     tabList.tabList.forEach((it) {
-      tabs.add(Tab(
+      _tabs.add(Tab(
         text: it.name,
         key: Key(it.id.toString()),
       ));
     });
-    _tabController = new TabController(vsync: this, length: tabs.length);
+    _tabController = new TabController(vsync: this, length: _tabs.length);
     _tabController.animateTo(2);
-    setState(() {
-      _status = LoadingStatus.success;
-    });
+    if (mounted)
+      setState(() {
+        _status = LoadingStatus.success;
+      });
   }
 
   _scrollToTap(int index) {
     _tabController.animateTo(index);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

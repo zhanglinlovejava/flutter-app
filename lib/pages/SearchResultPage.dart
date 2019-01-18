@@ -15,8 +15,7 @@ class SearchResultPage extends StatefulWidget {
   final Map<String, String> params;
   final String title;
 
-  SearchResultPage(this.url,
-      {this.params, this.title = ''});
+  SearchResultPage(this.url, {this.params, this.title = ''});
 
   _SearchResultPageState createState() => _SearchResultPageState();
 }
@@ -41,6 +40,7 @@ class _SearchResultPageState extends BaseLoadListSate<SearchResultPage> {
       String actionUrl = data['actionUrl'];
       return TextCardWidget(
           title: data['text'],
+          showTitleArrow: false,
           rightBtnText: actionUrl == null ? '' : '显示全部',
           align: MainAxisAlignment.spaceBetween,
           onRightBtnTap: () {
@@ -81,14 +81,7 @@ class _SearchResultPageState extends BaseLoadListSate<SearchResultPage> {
       duration: data['duration'],
       category: data['category'],
       onCoverTap: () {
-        ActionViewUtils.actionVideoPlayPage(context,
-            desc: data['description'],
-            id: data['id'],
-            category: data['category'],
-            author: data['author'],
-            cover: data['cover'],
-            consumption: data['consumption'],
-            title: data['title']);
+        ActionViewUtils.actionVideoPlayPage(context, data['id']);
       },
     );
   }
@@ -106,14 +99,7 @@ class _SearchResultPageState extends BaseLoadListSate<SearchResultPage> {
           userType: 'PGC',
           duration: _data['duration'],
           onCoverTap: () {
-            ActionViewUtils.actionVideoPlayPage(context,
-                desc: _data['description'],
-                id: _data['id'],
-                category: _data['category'],
-                author: _data['author'],
-                cover: _data['cover'],
-                consumption: _data['consumption'],
-                title: _data['title']);
+            ActionViewUtils.actionVideoPlayPage(context, _data['id']);
           },
         ));
   }
@@ -139,14 +125,6 @@ class _SearchResultPageState extends BaseLoadListSate<SearchResultPage> {
 
   @override
   Widget getAppBar() {
-    if (widget.title == '') {
-      return null;
-    } else {
-      return AppBar(
-          backgroundColor: Colors.white,
-          iconTheme: IconThemeData(color: Colors.black),
-          title: Text(widget.title, style: TextStyle(color: Colors.black)),
-          centerTitle: true);
-    }
+    return ActionViewUtils.buildAppBar(title: widget.title);
   }
 }

@@ -29,10 +29,11 @@ class CustomImage extends StatelessWidget {
               )
             : new Container(),
         Center(
-          child: FadeInImage.assetNetwork(
+          child:
+          FadeInImage.assetNetwork(
             placeholder: placeHolePath,
             fadeOutDuration: Duration(microseconds: 100),
-            image: url,
+            image: url??'',
             width: width,
             height: height,
             fit: fit,

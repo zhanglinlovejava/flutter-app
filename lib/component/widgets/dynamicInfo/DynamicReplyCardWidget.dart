@@ -34,6 +34,8 @@ class DynamicReplyCardWidget extends StatelessWidget {
                 desc: data['text'],
                 isDark: true,
                 rightBtnType: 'hotReply',
+                id: data['user']['uid'].toString(),
+                userType: data['user']['userType'],
               ),
               new Container(
                 alignment: Alignment.centerLeft,

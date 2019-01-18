@@ -6,6 +6,8 @@ import 'package:flutter_open/pages/CommunityPage.dart';
 import './MinePage.dart';
 import '../entity/TabList.dart';
 import 'package:flutter_open/component/BaseAliveState.dart';
+import '../pages/RankListPage.dart';
+import '../api/API.dart';
 const int INDEX_HOME = 0;
 const int INDEX_COMMUNITY = 1;
 const int INDEX_NOTIFICATION = 2;
@@ -46,7 +48,7 @@ class _MainPageState extends BaseAliveSate<MainPage>
         children: <Widget>[
           new HomePage(widget.homeTabList),
           new CommunityPage(),
-          new NotificationPage(),
+          new RankListPage(API.MESSAGE_TAB,title: 'notification',type: 'message'),
           new MinePage()
         ],
         controller: controller,

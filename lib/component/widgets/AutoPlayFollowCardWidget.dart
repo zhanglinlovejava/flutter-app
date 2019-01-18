@@ -57,14 +57,7 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
         duration: _data['duration'],
         id: _data['id'],
         onCoverTap: () {
-          ActionViewUtils.actionVideoPlayPage(context,
-              desc: _data['description'],
-              id: _data['id'],
-              category: _data['category'],
-              author: _data['author'] ?? _data['owner'],
-              cover: _data['cover'],
-              consumption: _data['consumption'],
-              title: _data['title']);
+          ActionViewUtils.actionVideoPlayPage(context, _data['id']);
         },
       );
     } else if (type == 'UgcPictureBean') {
