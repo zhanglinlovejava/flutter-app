@@ -7,6 +7,10 @@ import 'AuthorInfoWidget.dart';
 import '../../Constants.dart';
 import '../../pages/StickyHeaderTabPage.dart';
 import '../../api/API.dart';
+import 'package:flutter_open/component/widgets/button/FavouriteBtnWidget.dart';
+import 'button/ShareBtnWidget.dart';
+import '../../db/DBManager.dart';
+import '../../entity/CollectionEntity.dart';
 
 class AutoPlayFollowCardWidget extends StatefulWidget {
   final data;
@@ -22,10 +26,12 @@ class AutoPlayFollowCardWidget extends StatefulWidget {
 class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
   var data;
   int descMaxLines = 2;
+  DBManager _db;
 
   @override
   void initState() {
     super.initState();
+    _db = DBManager();
     data = widget.data;
   }
 
@@ -155,34 +161,46 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
   }
 
   _renderBottomBar() {
+    var _data = data['content']['data'];
+    String _type = _data['dataType'];
+    String title, cover, category, type, resourceType;
+    int id, duration;
+    if (_type == 'VideoBeanForClient' || _type == 'UgcVideoBean') {
+      cover = _data['cover']['feed'];
+      type = 'video';
+      duration = _data['duration'];
+    } else if (_type == 'UgcPictureBean') {
+      type = 'picture';
+      cover = _data['url'];
+      resourceType = _data['resourceType'];
+    }
+    category = '#开眼精选';
+    title = _data['description'];
+    id = _data['id'];
     return new Container(
-      margin: EdgeInsets.only(top: 15),
+      margin: EdgeInsets.only(top: 15, left: 10, right: 10),
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          new Row(
-            children: <Widget>[
-              Icon(
-                Icons.favorite_border,
-                size: 20,
-                color: Colors.grey,
-              ),
-              new Padding(
-                padding: EdgeInsets.only(left: 5),
-                child: Text(
-                  data['content']['data']['consumption']['collectionCount']
-                      .toString(),
-                  style: TextStyle(color: Colors.grey),
-                ),
-              )
-            ],
+          FavouriteBtnWidget(
+            id,
+            title: title,
+            type: type,
+            category: category,
+            duration: duration,
+            cover: cover,
+            resourceType: resourceType,
           ),
           new Row(
             children: <Widget>[
-              Image(
-                image: AssetImage('asset/images/comment_grey.png'),
-                width: 18,
-                height: 18,
+              GestureDetector(
+                onTap: () {
+                },
+                child: Image(
+                  image: AssetImage('asset/images/comment_grey.png'),
+                  width: 18,
+                  height: 18,
+                ),
               ),
               new Padding(
                 padding: EdgeInsets.only(left: 5),
@@ -198,11 +216,26 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
             TimelineUtil.format(data['content']['data']['releaseTime']),
             style: TextStyle(color: Colors.grey),
           ),
-          Icon(
-            Icons.share,
-            size: 20,
-            color: Colors.grey,
-          )
+          ShareBtnWidget(
+              actionType: _type == 'UgcPictureBean'
+                  ? ShareType.picture
+                  : ShareType.authorVideo,
+              onSaveImage: () {
+                print('保存图片');
+              },
+              onCacheVideo: () async {
+                if (_type == 'UgcPictureBean') return;
+                var _data = data['content']['data'];
+                CollectionEntity ce = CollectionEntity(
+                    source: DBSource.cache,
+                    title: _data['title'],
+                    category: '已缓存',
+                    type: 'video',
+                    cover: _data['cover']['feed'],
+                    duration: _data['duration'],
+                    itemId: _data['id']);
+                await _db.saveCollection(ce);
+              })
         ],
       ),
     );

@@ -15,24 +15,9 @@ class SingleBannerWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         String actionUrl = data['actionUrl'];
-        if (actionUrl.startsWith('eyepetizer://lightTopic/detail')) {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (BuildContext context) {
-            return LightTopicPage(
-              topicId: data['id'],
-              title: data['title'],
-            );
-          }));
-        } else if (actionUrl.startsWith('eyepetizer://webview')) {
-          Navigator.of(context)
-              .push(new MaterialPageRoute(builder: (BuildContext context) {
-            String url = Uri.decodeFull(
-                StringUtil.getValueFromActionUrl(actionUrl, 'url'));
-            return WebViewPage(url: url, title: data['title']);
-          }));
-        } else {
-          print('--->    $actionUrl');
-        }
+        print('--- $actionUrl');
+        ActionViewUtils.actionByActionUrl(context, actionUrl,
+            id: data['id'], title: data['title']);
       },
       child: new Container(
           margin: EdgeInsets.only(bottom: 5, top: 5),

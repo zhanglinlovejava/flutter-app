@@ -20,7 +20,7 @@ class LoadErrorWidget extends StatelessWidget {
           children: <Widget>[
             Container(
               child: Image.asset('asset/images/empty_logo.png',
-                  width: 50, height: 50),
+                  width: 40, height: 40),
               margin: EdgeInsets.only(bottom: 10),
             ),
             Text(

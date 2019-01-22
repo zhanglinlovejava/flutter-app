@@ -42,7 +42,7 @@ class StringUtil {
     List<String> keyValues = array[1].split('&');
     for (var i = 0; i < keyValues.length; i++) {
       List<String> kvs = keyValues[i].split('=');
-      params['${kvs[0]}'] = kvs[1];
+      params['${kvs[0]}'] = kvs[1]??' ';
     }
     return params;
   }

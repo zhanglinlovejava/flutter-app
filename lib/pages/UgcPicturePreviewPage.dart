@@ -8,6 +8,9 @@ import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
 import 'package:flutter_open/component/widgets/image/CustomImage.dart';
 import '../pages/StickyHeaderTabPage.dart';
 import '../api/API.dart';
+import 'package:flutter_open/component/widgets/button/FavouriteBtnWidget.dart';
+import '../Constants.dart';
+import '../component/widgets/button/ShareBtnWidget.dart';
 
 class UgcPicturePreviewWidget extends StatefulWidget {
   final index;
@@ -89,10 +92,10 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
     return Offstage(
       offstage: !showInfoView,
       child: new Container(
-        height: 200,
         decoration: BoxDecoration(color: Color.fromRGBO(0, 0, 0, 0.5)),
         padding: EdgeInsets.all(10),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             AuthorInfoWidget(
@@ -107,8 +110,6 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
               margin: EdgeInsets.only(top: 10),
               child: Text(
                 _data['description'],
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                     color: Colors.white,
                     decoration: TextDecoration.none,
@@ -172,26 +173,13 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          new Row(
-            children: <Widget>[
-              Icon(
-                Icons.favorite_border,
-                size: 20,
-                color: Colors.white,
-              ),
-              new Padding(
-                padding: EdgeInsets.only(left: 5),
-                child: Text(
-                  _data['consumption']['collectionCount'].toString(),
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      decoration: TextDecoration.none),
-                ),
-              )
-            ],
-          ),
+          FavouriteBtnWidget(_data['id'],
+              isDark: false,
+              type: 'picture',
+              title: _data['description'],
+              cover: _data['url'],
+              resourceType: widget.resourceType,
+              category: '#开眼精选'),
           new Row(
             children: <Widget>[
               Icon(
@@ -212,11 +200,7 @@ class _UgcPicturePreviewWidget extends State<UgcPicturePreviewWidget>
               )
             ],
           ),
-          Icon(
-            Icons.share,
-            size: 20,
-            color: Colors.white,
-          )
+          ShareBtnWidget(colorType: 1,actionType: ShareType.picture)
         ],
       ),
     );

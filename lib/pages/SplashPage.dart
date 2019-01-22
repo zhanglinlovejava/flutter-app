@@ -13,11 +13,13 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   TabList _homeTabList;
+  TabList _communityTabList;
   Timer _timer;
   @override
   void initState() {
     super.initState();
     _fetchHomeTabList();
+    _fetchCommunityTabList();
     _timerToMain();
   }
 
@@ -39,12 +41,17 @@ class _SplashPageState extends State<SplashPage> {
         _homeTabList = TabList.map(data['tabInfo']['tabList']);
       }, token: 'SplashHomeTab');
   }
+  _fetchCommunityTabList() async {
+    await HttpController.getInstance().get(API.COMMUNITY_TAB, (data) {
+      _communityTabList = TabList.map(data['tabInfo']['tabList']);
+    }, token: 'SplashHomeTab');
+  }
   _timerToMain() {
    _timer =  new Timer(Duration(seconds: 2), () {
       HttpController.getInstance().cancelRequest('SplashHomeTab');
       HttpController.getInstance().cancelRequest('SplashCommunityTab');
       Navigator.pushAndRemoveUntil(context, new MaterialPageRoute(builder: (_) {
-        return new MainPage(_homeTabList);
+        return new MainPage(_homeTabList,_communityTabList);
       }), (Route<dynamic> route) => false);
     });
   }

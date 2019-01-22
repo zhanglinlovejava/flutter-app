@@ -4,14 +4,21 @@ import 'package:flutter_open/utils/ActionViewUtils.dart';
 class BriefCardWidget extends StatelessWidget {
   final String icon;
   final String title;
+  final String desc;
   final VoidCallback onTap;
+  final double titleFontSize;
 
-  BriefCardWidget({@required this.icon, this.title = '', this.onTap});
+
+  BriefCardWidget(
+      {@required this.icon,
+      this.title = '',
+      this.onTap,
+      this.desc = '',
+      this.titleFontSize = 18});
 
   @override
   Widget build(BuildContext context) {
     return new Container(
-      margin: EdgeInsets.only(bottom: 10),
       child: GestureDetector(
         onTap: () {
           if (onTap != null) {
@@ -22,22 +29,41 @@ class BriefCardWidget extends StatelessWidget {
           alignment: AlignmentDirectional.center,
           children: <Widget>[
             new Container(
+              height: double.infinity,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
               foregroundDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
                   color: Color.fromRGBO(0, 0, 0, title == '' ? 0 : 0.3)),
               child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(3)),
+                borderRadius: BorderRadius.all(Radius.circular(5)),
                 child: Image.network(
                   icon,
                   width: double.infinity,
-                  height: 150,
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-            Text(
-              title,
-              style: TextStyle(
-                  fontSize: 18, color: Colors.white, fontFamily: 'FZLanTing'),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  title,
+                  style: TextStyle(
+                      fontSize: titleFontSize,
+                      color: Colors.white,
+                      fontFamily: 'FZLanTing'),
+                ),
+                desc == '' || desc == null
+                    ? Container()
+                    : Text(
+                        desc,
+                        style: TextStyle(
+                            fontSize: titleFontSize - 6,
+                            color: Colors.white70,
+                            fontFamily: 'FZLanTing'),
+                      )
+              ],
             )
           ],
         ),

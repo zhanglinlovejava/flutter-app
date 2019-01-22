@@ -4,7 +4,9 @@ class TabInfo {
   String _apiUrl;
   String _bgPicture;
 
-  TabInfo(this._id, this._name, this._apiUrl, this._bgPicture);
+  TabInfo(this._id, this._name);
+
+//  TabInfo(this._id, this._name, this._apiUrl, this._bgPicture);
 
   TabInfo.map(obj) {
     this._id = obj['id'];

@@ -53,51 +53,54 @@ abstract class BaseLoadListSate<T extends StatefulWidget>
     }
   }
 
+  Future _onRefresh() async {
+    _retryFetch();
+  }
+
   _renderContent() {
-    return new Container(
-        height: double.infinity,
-        color: Colors.white,
-        width: double.infinity,
-        padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
-        child: new LoadingView(
-          status: status,
-          loadingContent:
-              const PlatformAdaptiveProgressIndicator(strokeWidth: 2),
-          emptyContent: LoadEmptyWidget(onRetryFunc: () {
-            _retryFetch();
-          }),
-          errorContent: LoadErrorWidget(onRetryFunc: () {
-            _retryFetch();
-          }),
-          successContent: registerScrollController()
-              ? new ListView.builder(
-                  itemCount: itemList.length,
-                  controller: scrollController,
-                  itemBuilder: (BuildContext context, int index) {
-                    return renderItemRow(context, index);
-                  })
-              : new ListView.builder(
-                  itemCount: itemList.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return renderItemRow(context, index);
-                  }),
-        ));
+    return RefreshIndicator(
+        child: new Container(
+            height: double.infinity,
+            color: Colors.white,
+            width: double.infinity,
+            padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+            child: new LoadingView(
+              status: status,
+              loadingContent:
+                  const PlatformAdaptiveProgressIndicator(strokeWidth: 2),
+              emptyContent: LoadEmptyWidget(onRetryFunc: () {
+                _retryFetch();
+              }),
+              errorContent: LoadErrorWidget(onRetryFunc: () {
+                _retryFetch();
+              }),
+              successContent: registerScrollController()
+                  ? new ListView.builder(
+                      itemCount: itemList.length,
+                      controller: scrollController,
+                      itemBuilder: (BuildContext context, int index) {
+                        return renderItemRow(context, index);
+                      })
+                  : new ListView.builder(
+                      itemCount: itemList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return renderItemRow(context, index);
+                      }),
+            )),
+        onRefresh: _onRefresh);
   }
 
-  void _retryFetch() {
-    status = LoadingStatus.loading;
-    setState(() {});
-    fetchList();
-  }
-
-  refreshList(bool showLoading) {
+  _retryFetch({bool showLoading = false}) {
     start = 0;
-    if (showLoading) status = LoadingStatus.loading;
-    setState(() {});
-    fetchList();
+    if (showLoading) {
+      status = LoadingStatus.loading;
+      setState(() {});
+    }
+
+    fetchList(isRefresh: true);
   }
 
-  fetchList({bool isLoadMore = false}) {
+  fetchList({bool isLoadMore = false, isRefresh = false}) {
     if (hasNoMoreData) {
       return;
     }
@@ -125,6 +128,7 @@ abstract class BaseLoadListSate<T extends StatefulWidget>
           return;
         }
         start += num;
+        if (isRefresh) itemList.clear();
         temList.forEach((item) {
           if (item != null) {
             itemList.add(item);

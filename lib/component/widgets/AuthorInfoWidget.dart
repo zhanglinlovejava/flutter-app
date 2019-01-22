@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open/pages/StickyHeaderTabPage.dart';
-import 'package:flutter_open/component/widgets/FollowBtnWidget.dart';
+import 'package:flutter_open/component/widgets/button/FollowBtnWidget.dart';
 import 'image/CustomImage.dart';
 import '../../Constants.dart';
 import '../../api/API.dart';
+import 'button/ShareBtnWidget.dart';
 
 class AuthorInfoWidget extends StatelessWidget {
   final String name;
@@ -11,10 +12,12 @@ class AuthorInfoWidget extends StatelessWidget {
   final String avatar;
   final bool isDark;
   final String id;
-  final String userType;
   final String rightBtnType;
   final bool showCircleAvatar;
   final int maxLines;
+  final String actionUrl;
+  final String userType;
+  final VoidCallback onCacheVideo;
 
   AuthorInfoWidget(
       {this.name = '',
@@ -23,9 +26,11 @@ class AuthorInfoWidget extends StatelessWidget {
       this.isDark = false,
       this.id,
       this.maxLines = 1,
-      this.userType,
       this.showCircleAvatar = true,
-      this.rightBtnType = 'none'});
+      this.rightBtnType = 'none',
+      this.userType,
+      this.onCacheVideo,
+      this.actionUrl = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +41,16 @@ class AuthorInfoWidget extends StatelessWidget {
               .push(MaterialPageRoute(builder: (BuildContext context) {
             Map<String, String> params = new Map();
             params['id'] = id;
-            params['userType'] = userType.toUpperCase();
-            return StickyHeaderTabPage(url: API.USER_TABS, params: params);
+            if (actionUrl.startsWith('eyepetizer://tag')) {
+              return StickyHeaderTabPage(
+                url: API.TAG_INFO_TAB,
+                params: params,
+                type: 'tagInfo',
+              );
+            } else {
+              params['userType'] = userType.toUpperCase();
+              return StickyHeaderTabPage(url: API.USER_TABS, params: params);
+            }
           }));
         },
         child: new Container(
@@ -75,7 +88,7 @@ class AuthorInfoWidget extends StatelessWidget {
                           color: isDark ? Colors.black : Colors.white,
                           fontSize: 14,
                           decoration: TextDecoration.none,
-                          fontFamily: 'FZLanTing'),
+                          fontFamily: ConsFonts.fzFont),
                     ),
                     desc == '' || desc == null
                         ? new Container()
@@ -87,7 +100,7 @@ class AuthorInfoWidget extends StatelessWidget {
                                   color:
                                       isDark ? Colors.grey : Color(0xffdddddd),
                                   fontSize: 12,
-                                  fontFamily: 'FZLanTing'),
+                                  fontFamily: ConsFonts.fzFont),
                               maxLines: maxLines,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -101,11 +114,14 @@ class AuthorInfoWidget extends StatelessWidget {
         ));
   }
 
-  _renderHeaderView() {}
-
   _renderRightBtn() {
     if (rightBtnType == 'share') {
-      return _renderShareBtn();
+      return ShareBtnWidget(
+        actionType: ShareType.authorVideo,
+        onCacheVideo: () {
+          if (onCacheVideo != null) onCacheVideo();
+        },
+      );
     } else if (rightBtnType == 'follow') {
       return FollowBtnWidget(isDark: isDark);
     } else if (rightBtnType == 'arrow') {
@@ -146,16 +162,6 @@ class AuthorInfoWidget extends StatelessWidget {
           width: 10,
         )
       ],
-    );
-  }
-
-  _renderShareBtn() {
-    return Container(
-      child: Icon(
-        Icons.share,
-        size: 20,
-        color: isDark ? Colors.grey : Colors.white,
-      ),
     );
   }
 }

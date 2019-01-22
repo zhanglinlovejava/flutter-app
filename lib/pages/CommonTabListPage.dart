@@ -10,17 +10,18 @@ import '../pages/CommonListPage.dart';
 import '../utils/ActionViewUtils.dart';
 import '../Constants.dart';
 
-class RankListPage extends StatefulWidget {
+class CommonTabListPage extends StatefulWidget {
   final String tabListUrl;
   final String title;
   final String type;
-  RankListPage(this.tabListUrl, {this.title, this.type = 'common'});
+  final Map<String,String> params;
+  CommonTabListPage(this.tabListUrl, {this.title, this.type = 'common',this.params});
 
   @override
-  _RankListPageState createState() => _RankListPageState();
+  _CommonTabListPageState createState() => _CommonTabListPageState();
 }
 
-class _RankListPageState extends State<RankListPage>
+class _CommonTabListPageState extends State<CommonTabListPage>
     with SingleTickerProviderStateMixin {
   LoadingStatus _status = LoadingStatus.loading;
   TabController _tabController;
@@ -104,6 +105,6 @@ class _RankListPageState extends State<RankListPage>
       if (mounted) {
         setState(() {});
       }
-    });
+    },params: widget.params);
   }
 }

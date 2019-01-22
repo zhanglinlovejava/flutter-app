@@ -6,12 +6,13 @@ import 'BriefCardWidget.dart';
 import '../../Constants.dart';
 import 'TextCardWidget.dart';
 import '../../api/API.dart';
+import '../../entity/CollectionEntity.dart';
+import '../../db/DBManager.dart';
 
 class SquareCardCollectionWidget extends StatelessWidget {
   final data;
   final bool showTopView;
   final showBottomAvatar;
-  double height = 190;
   final VoidCallback onRightTap;
   final VoidCallback onTitleTap;
 
@@ -25,6 +26,7 @@ class SquareCardCollectionWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     List childList = data['itemList'];
     String type = childList[0]['type'];
+    double height = 190;
     if (type == 'followCard') {
       height = 300;
     } else if (type == 'banner' || type == 'banner2' || type == 'banner3') {
@@ -33,6 +35,8 @@ class SquareCardCollectionWidget extends StatelessWidget {
       height = 242;
     } else if (type == 'squareCardOfCategory') {
       height = 150;
+    } else if (type == 'squareCardOfTag') {
+      height = 130;
     }
     return new Container(
       margin: EdgeInsets.only(top: 10),
@@ -42,7 +46,7 @@ class SquareCardCollectionWidget extends StatelessWidget {
           showTopView ? _renderTopView() : new Container(),
           showTopView ? _renderMiddleView() : new Container(),
           Expanded(
-            child: _renderBottomView(context, childList, type),
+            child: _renderBottomView(context, childList, type, height),
           )
         ],
       ),
@@ -82,7 +86,7 @@ class SquareCardCollectionWidget extends StatelessWidget {
     );
   }
 
-  _renderBottomView(BuildContext context, childList, type) {
+  _renderBottomView(BuildContext context, childList, type, double height) {
     double width =
         MediaQuery.of(context).size.width - (childList.length <= 1 ? 30 : 60);
     return new Container(
@@ -108,6 +112,17 @@ class SquareCardCollectionWidget extends StatelessWidget {
                   userType: 'PGC',
                   onCoverTap: () {
                     ActionViewUtils.actionVideoPlayPage(context, _data['id']);
+                  },
+                  onCacheVideo: () async {
+                    CollectionEntity ce = CollectionEntity(
+                        source: DBSource.cache,
+                        title: _data['title'],
+                        cover: _data['cover']['feed'],
+                        duration: _data['duration'],
+                        type: 'video',
+                        itemId: _data['id'],
+                        category: '已缓存');
+                    await DBManager().saveCollection(ce);
                   },
                 ),
               );
@@ -147,9 +162,25 @@ class SquareCardCollectionWidget extends StatelessWidget {
                     title: item['title'],
                     onTap: () {
                       ActionViewUtils.actionTagInfoPage(
-                          API.CATEGORY_INFO_TAB, context, item['actionUrl'],
-                          type: 'categoryInfo');
+                          API.TAG_INFO_TAB, context, item['actionUrl'],
+                          type: 'tagInfo');
                     }),
+              );
+            } else if (type == 'squareCardOfTag') {
+              return Container(
+                margin: EdgeInsets.only(right: 5, bottom: 10),
+                height: height,
+                width: 140,
+                child: BriefCardWidget(
+                  icon: item['bgPicture'],
+                  title: item['tagName'],
+                  desc: '${item['seenCount']}人观看',
+                  titleFontSize: 16,
+                  onTap: () {
+                    ActionViewUtils.actionByActionUrl(
+                        context, item['actionUrl']);
+                  },
+                ),
               );
             } else {
               return Text(type + "----");

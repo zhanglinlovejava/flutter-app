@@ -5,12 +5,12 @@ import 'package:flutter_open/component/loading/LoadingStatus.dart';
 import 'package:flutter_open/component/loading/platform_adaptive_progress_indicator.dart';
 import 'package:flutter_open/component/widgets/LoadErrorWidget.dart';
 import 'package:flutter_open/pages/CommonListPage.dart';
-import 'package:flutter_open/component/widgets/FollowBtnWidget.dart';
+import 'package:flutter_open/component/widgets/button/FollowBtnWidget.dart';
 import 'package:flutter_open/entity/TabList.dart';
 import 'dart:io';
-import '../component/widgets/FollowBtnWidget.dart';
 import '../Constants.dart';
 import '../component/widgets/image/CustomImage.dart';
+import '../component/widgets/button/ShareBtnWidget.dart';
 
 const double tabBarHeight = 40;
 const double userDescHeight = 40;
@@ -42,6 +42,7 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
   var _userInfo;
   bool _isPgc = false;
   String _userType;
+  bool _isDark = false;
 
   @override
   void initState() {
@@ -55,7 +56,8 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
     _expandedHeight = _type == 'userInfo' ? userInfoHeight : tagInfoHeight;
     _scrollController.addListener(() {
       _opacity = _scrollController.offset / _scrollMaxHeight;
-      _titleColor = _opacity > 0.6 ? _titleColor = Colors.black : Colors.white;
+      _isDark = _opacity > 0.6;
+      _titleColor = _isDark ? _titleColor = Colors.black : Colors.white;
       setState(() {});
     });
     _fetchTabList();
@@ -137,20 +139,15 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
   _renderAppBarActions() {
     List<Widget> list = [];
     if (_isPgc) {
-      list.add(GestureDetector(
-          onTap: () {
-            print('分享');
-          },
-          child: Container(
-              padding: EdgeInsets.only(left: 15,right: 10),
-              child: Icon(Icons.share, color: _titleColor, size: 20))));
+      list.add(ShareBtnWidget(
+          colorType: _isDark ? -1 : 1, actionType: ShareType.share));
       list.add(GestureDetector(
           onTap: () {
             print('更多操作');
           },
           child: Container(
-            padding: EdgeInsets.only(left: 10,right: 15),
-              child: Icon(Icons.more_vert, color: _titleColor, size: 25))));
+              padding: EdgeInsets.only(left: 10, right: 15),
+              child: Icon(Icons.more_vert, color: _titleColor, size: 20))));
     }
     return list;
   }
@@ -282,6 +279,7 @@ class _StickyHeaderTabPageState extends State<StickyHeaderTabPage>
             height: userDescHeight,
             child: Text(
               _userInfo['description'],
+              maxLines: 2,
               style:
                   TextStyle(color: Colors.grey, fontFamily: ConsFonts.fzFont),
             ))

@@ -15,25 +15,8 @@ class MessageItemWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         String actionUrl = msgItem['actionUrl'];
-        if (actionUrl.startsWith('eyepetizer://detail')) {
-          String videoId = StringUtil.getTagIdFromActionUrl(actionUrl);
-          print('$videoId');
-          ActionViewUtils.actionVideoPlayPage(context, int.parse(videoId));
-        } else if (actionUrl.startsWith('eyepetizer://tag')) {
-          print('message----$actionUrl');
-          ActionViewUtils.actionTagInfoPage(
-              API.TAG_INFO_TAB, context, actionUrl,
-              type: 'tagInfo');
-        } else if (actionUrl.startsWith('eyepetizer://homepage/selected')) {
-        } else if (actionUrl.startsWith('eyepetizer://webview')) {
-          String url = StringUtil.getValueFromActionUrl(actionUrl, 'url');
-          Navigator.of(context)
-              .push(new MaterialPageRoute(builder: (BuildContext context) {
-            return WebViewPage(url: url, title: msgItem['title']);
-          }));
-        } else {
-          print('message----$actionUrl');
-        }
+        ActionViewUtils.actionByActionUrl(context, actionUrl,
+            title: msgItem['title']);
       },
       child: new Container(
         padding: EdgeInsets.only(bottom: 15, top: 15),

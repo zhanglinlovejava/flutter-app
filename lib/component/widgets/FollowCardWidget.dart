@@ -12,6 +12,7 @@ class FollowCardWidget extends StatelessWidget {
   final VoidCallback onCoverTap;
   final String id;
   final String userType;
+  final VoidCallback onCacheVideo;
 
   FollowCardWidget({
     @required this.cover,
@@ -21,6 +22,7 @@ class FollowCardWidget extends StatelessWidget {
     @required this.duration,
     @required this.id,
     @required this.userType,
+    this.onCacheVideo,
     this.showBottomAvatar = true,
     this.onCoverTap,
   });
@@ -57,13 +59,17 @@ class FollowCardWidget extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(top: 10, right: 5, bottom: 10),
             child: AuthorInfoWidget(
-                name: title,
-                desc: desc,
-                avatar: showBottomAvatar ? avatar : '',
-                id: id,
-                userType: userType,
-                isDark: true,
-                rightBtnType: 'share'),
+              name: title,
+              desc: desc,
+              avatar: showBottomAvatar ? avatar : '',
+              id: id,
+              userType: userType,
+              isDark: true,
+              rightBtnType: 'share',
+              onCacheVideo: () {
+                if (onCacheVideo != null) onCacheVideo();
+              },
+            ),
           )
         ],
       ),

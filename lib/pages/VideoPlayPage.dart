@@ -13,6 +13,10 @@ import '../component/loading/loading_view.dart';
 import '../component/loading/platform_adaptive_progress_indicator.dart';
 import '../component/widgets/LoadErrorWidget.dart';
 import '../Constants.dart';
+import 'package:flutter_open/component/widgets/button/FavouriteBtnWidget.dart';
+import '../db/DBManager.dart';
+import '../entity/CollectionEntity.dart';
+import '../component/widgets/button/ShareBtnWidget.dart';
 
 class VideoPlayPage extends StatefulWidget {
   final int videoId;
@@ -32,10 +36,12 @@ class VideoPlayState extends State<VideoPlayPage> {
   String _title;
   String _desc;
   String _category;
+  DBManager _db;
 
   @override
   void initState() {
     super.initState();
+    _db = DBManager();
     _fetchVideoInfo();
     _getRelatedList();
   }
@@ -95,6 +101,19 @@ class VideoPlayState extends State<VideoPlayPage> {
                   },
                   category: '${_item['category']} / 开眼精选',
                   duration: _item['duration'],
+                  showShareBtn: true,
+                  onCacheVideo: () async {
+                    CollectionEntity ce = CollectionEntity(
+                      source: DBSource.cache,
+                      itemId: _videoData['id'],
+                      type: 'video',
+                      cover: _videoData['cover']['feed'],
+                      title: _title,
+                      duration: _videoData['duration'],
+                      category: '已缓存',
+                    );
+                    await _db.saveCollection(ce);
+                  },
                   isDarkTheme: false),
             );
           }
@@ -112,7 +131,7 @@ class VideoPlayState extends State<VideoPlayPage> {
           fit: BoxFit.cover,
         ),
         height: Platform.isIOS ? 210 : 190,
-        autoPlay: false,
+        autoPlay: bool.fromEnvironment("dart.vm.product"),
         title: _title,
       ),
     );
@@ -156,92 +175,74 @@ class VideoPlayState extends State<VideoPlayPage> {
                     color: Colors.white70,
                     fontFamily: ConsFonts.fzFont),
               )),
-          new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              new Row(
-                children: <Widget>[
-                  new Icon(
-                    Icons.favorite_border,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.only(left: 7),
-                    child: new Text(
-                      _consumption == null
-                          ? '0'
-                          : _consumption['collectionCount'].toString(),
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: ConsFonts.fzFont,
-                          fontSize: 12),
+          Container(
+            padding: EdgeInsets.only(left: 10, right: 10),
+            child: new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                FavouriteBtnWidget(widget.videoId,
+                    title: _title,
+                    category: _category,
+                    duration: _videoData['duration'],
+                    cover: _videoData['cover']['feed'],
+                    type: 'video',
+                    isDark: false),
+                new Row(
+                  children: <Widget>[
+                    Icon(Icons.share, color: Colors.white, size: 20),
+                    new Padding(
+                      padding: EdgeInsets.only(left: 7),
+                      child: new Text(
+                        _consumption == null
+                            ? '0'
+                            : _consumption['shareCount'].toString(),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: ConsFonts.fzFont,
+                            fontSize: 12),
+                      ),
+                    )
+                  ],
+                ),
+                new Row(
+                  children: <Widget>[
+                    new Icon(
+                      Icons.comment,
+                      color: Colors.white,
+                      size: 20,
                     ),
-                  )
-                ],
-              ),
-              new Row(
-                children: <Widget>[
-                  new Icon(
-                    Icons.share,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.only(left: 7),
-                    child: new Text(
-                      _consumption == null
-                          ? '0'
-                          : _consumption['shareCount'].toString(),
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: ConsFonts.fzFont,
-                          fontSize: 12),
-                    ),
-                  )
-                ],
-              ),
-              new Row(
-                children: <Widget>[
-                  new Icon(
-                    Icons.comment,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.only(left: 7),
-                    child: new Text(
-                      _consumption == null
-                          ? '0'
-                          : _consumption['replyCount'].toString(),
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'FZLanTing',
-                          fontSize: 12),
-                    ),
-                  )
-                ],
-              ),
-              new Row(
-                children: <Widget>[
-                  new Icon(
-                    Icons.file_download,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.only(left: 7),
-                    child: new Text(
-                      '缓存',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'FZLanTing',
-                          fontSize: 12),
-                    ),
-                  )
-                ],
-              )
-            ],
+                    new Padding(
+                      padding: EdgeInsets.only(left: 7),
+                      child: new Text(
+                        _consumption == null
+                            ? '0'
+                            : _consumption['replyCount'].toString(),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: ConsFonts.fzFont,
+                            fontSize: 12),
+                      ),
+                    )
+                  ],
+                ),
+                ShareBtnWidget(
+                  colorType: 1,
+                  showRightText: true,
+                  actionType: ShareType.video,
+                  onCacheVideo: () async {
+                    CollectionEntity ce = CollectionEntity(
+                        source: DBSource.cache,
+                        title: _title,
+                        category: '已缓存',
+                        type: 'video',
+                        cover: _videoData['cover']['feed'],
+                        duration: _videoData['duration'],
+                        itemId: _videoData['id']);
+                    await _db.saveCollection(ce);
+                  },
+                ),
+              ],
+            ),
           ),
           renderAuthorInfo()
         ],
@@ -268,16 +269,30 @@ class VideoPlayState extends State<VideoPlayPage> {
         ));
   }
 
+  _saveWatchHistory() async {
+    CollectionEntity ce = CollectionEntity(
+        source: DBSource.watch,
+        title: _title,
+        category: _category,
+        type: 'video',
+        cover: _videoData['cover']['feed'],
+        duration: _videoData['duration'],
+        itemId: _videoData['id']);
+    await _db.saveCollection(ce);
+  }
+
   _onItemTap(_item) {
     _videoData = _item;
     _parseTopData();
-    _controller = VideoPlayerController.network(_videoData['playUrl']);
     setState(() {});
     double duration = (_scrollController.offset /
             _scrollController.position.maxScrollExtent) *
         500;
-    _scrollController.animateTo(0, duration: Duration(milliseconds: duration.toInt()),curve: Curves.easeIn);
+    _scrollController.animateTo(0,
+        duration: Duration(milliseconds: duration.toInt()),
+        curve: Curves.easeIn);
     _getRelatedList();
+    _saveWatchHistory();
   }
 
   _getRelatedList() async {
@@ -302,6 +317,7 @@ class VideoPlayState extends State<VideoPlayPage> {
       if (data != null) {
         _videoData = data;
         _parseTopData();
+        _saveWatchHistory();
       } else {
         _status = LoadingStatus.error;
       }

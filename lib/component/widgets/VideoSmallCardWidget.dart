@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_open/utils/ActionViewUtils.dart';
+import 'button/ShareBtnWidget.dart';
+import '../../Constants.dart';
 
 class VideoSmallCardWidget extends StatelessWidget {
   final id;
@@ -9,6 +11,8 @@ class VideoSmallCardWidget extends StatelessWidget {
   final String category;
   final VoidCallback onCoverTap;
   final isDarkTheme;
+  final VoidCallback onCacheVideo;
+  final bool showShareBtn;
 
   VideoSmallCardWidget(
       {this.id,
@@ -17,6 +21,8 @@ class VideoSmallCardWidget extends StatelessWidget {
       @required this.title,
       @required this.onCoverTap,
       this.isDarkTheme = true,
+      this.showShareBtn = false,
+      this.onCacheVideo,
       @required this.category});
 
   @override
@@ -56,6 +62,7 @@ class VideoSmallCardWidget extends StatelessWidget {
               ),
               Expanded(
                 child: new Container(
+                  color: Colors.transparent,
                   padding: EdgeInsets.all(10),
                   child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,16 +73,32 @@ class VideoSmallCardWidget extends StatelessWidget {
                         style: TextStyle(
                             fontSize: 14,
                             color: isDarkTheme ? Colors.black : Colors.white,
-                            fontFamily: 'FZLanTing'),
+                            fontFamily: ConsFonts.fzFont),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      new Text(
-                        '#$category',
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: isDarkTheme ? Colors.grey : Colors.white70,
-                            fontFamily: 'FZLanTing'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          new Text(
+                            '#$category',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color:
+                                    isDarkTheme ? Colors.grey : Colors.white70,
+                                fontFamily: ConsFonts.fzFont),
+                          ),
+                          showShareBtn
+                              ? ShareBtnWidget(
+                                  actionType: ShareType.video,
+                                  onCacheVideo: () {
+                                    if (onCacheVideo != null) {
+                                      onCacheVideo();
+                                    }
+                                  },
+                                  colorType: isDarkTheme ? 0 : 1)
+                              : Container()
+                        ],
                       ),
                     ],
                   ),

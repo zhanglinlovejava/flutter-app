@@ -10,11 +10,16 @@ import 'package:flutter_open/component/BaseAliveState.dart';
 import 'package:flutter_open/api/API.dart';
 import 'SearchPage.dart';
 import '../utils/ActionViewUtils.dart';
+import '../event/EventUtils.dart';
+import 'dart:async';
+import '../event/Events.dart';
 
 class HomePage extends StatefulWidget {
-  final TabList homeTabList;
+  final TabList tabList;
+  final int index;
+  final String type;
 
-  HomePage(this.homeTabList);
+  HomePage(this.tabList, {this.index = 0, this.type = 'home'});
 
   @override
   _HomePageState createState() {
@@ -27,10 +32,22 @@ class _HomePageState extends BaseAliveSate<HomePage>
   TabController _tabController;
   List<Tab> _tabs = <Tab>[];
   LoadingStatus _status = LoadingStatus.loading;
+  TabList _tabList;
+  String url = API.HOME_TAB;
+  StreamSubscription<UpdateHomeTabEvent> _streamSubscription;
 
   @override
   void initState() {
     super.initState();
+    if (widget.type == 'home') {
+      url = API.HOME_TAB;
+      _streamSubscription =
+          EventUtils.on<UpdateHomeTabEvent>((UpdateHomeTabEvent event) {
+        _tabController.animateTo(event.index);
+      });
+    } else if (widget.type == 'community') {
+      url = API.COMMUNITY_TAB;
+    }
     _getTabListIfNeed();
   }
 
@@ -49,11 +66,16 @@ class _HomePageState extends BaseAliveSate<HomePage>
           successContent: new Column(
             children: <Widget>[
               _buildTabBar(),
-              Expanded(
-                  child: TabBarView(
-                controller: _tabController,
-                children: _buildTabPage(),
-              ))
+              _tabList != null && _tabList.tabList != null
+                  ? Expanded(
+                      child: TabBarView(
+                      controller: _tabController,
+                      children: _tabList.tabList.map((tab) {
+                        return CommonListPage(tab.apiUrl,
+                            userLoadMore: tab.id != -1);
+                      }).toList(),
+                    ))
+                  : Container()
             ],
           ),
         ));
@@ -65,20 +87,13 @@ class _HomePageState extends BaseAliveSate<HomePage>
       padding: EdgeInsets.only(left: 5, right: 5, top: 10, bottom: 5),
       child: new Row(
         children: <Widget>[
-          new Container(
-            width: 35,
-            child: new Icon(
-              Icons.menu,
-              size: 20,
-              color: Colors.black,
-            ),
-          ),
           _tabController == null
               ? new Container()
               : Expanded(
                   child: new Container(
+                      alignment: Alignment.center,
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: EdgeInsets.only(left: 35),
                       height: 30,
                       child: TabBar(
                           labelStyle:
@@ -113,66 +128,39 @@ class _HomePageState extends BaseAliveSate<HomePage>
     );
   }
 
-  List<Widget> _buildTabPage() {
-    List<Widget> list = [];
-    _tabs.forEach((tab) {
-      List<String> strings = tab.key.toString().split("'");
-      int id = int.parse(strings[1]);
-      if (id > 0) {
-        list.add(CommonListPage('${API.CATEGORY_LIST}/$id'));
-      } else if (id == -1) {
-        list.add(CommonListPage(API.DISCOVERY_LIST, userLoadMore: false));
-      } else if (id == -2) {
-        list.add(CommonListPage(API.RECOMMEND_LIST, changeTab: _scrollToTap));
-      } else if (id == -3) {
-        list.add(CommonListPage(API.DAILY_LIST));
-      } else if (id == -5) {
-        list.add(CommonListPage(API.FOLLOW_LIST));
-      }
-    });
-    return list;
-  }
-
   _getTabListIfNeed() async {
-    TabList tabList;
-    if (widget.homeTabList != null &&
-        widget.homeTabList.tabList != null &&
-        widget.homeTabList.tabList.length > 0) {
-      tabList = widget.homeTabList;
-      initTabBar(tabList);
+    if (widget.tabList != null &&
+        widget.tabList.tabList != null &&
+        widget.tabList.tabList.length > 0) {
+      _tabList = widget.tabList;
+      initTabBar();
     } else {
       _fetchTabList();
     }
   }
 
   _fetchTabList() async {
-    await HttpController.getInstance().get(API.HOME_TAB, (data) {
-      TabList tabList = TabList.map(data['tabInfo']['tabList']);
-      initTabBar(tabList);
+    await HttpController.getInstance().get(url, (data) {
+      _tabList = TabList.map(data['tabInfo']['tabList']);
+      initTabBar();
     }, errorCallback: (error) {});
   }
 
-  void initTabBar(TabList tabList) {
-    tabList.tabList.forEach((it) {
-      _tabs.add(Tab(
-        text: it.name,
-        key: Key(it.id.toString()),
-      ));
+  void initTabBar() {
+    _tabList.tabList.forEach((it) {
+      _tabs.add(Tab(text: it.name));
     });
     _tabController = new TabController(vsync: this, length: _tabs.length);
-    _tabController.animateTo(2);
+    _tabController.animateTo(widget.index);
     if (mounted)
       setState(() {
         _status = LoadingStatus.success;
       });
   }
 
-  _scrollToTap(int index) {
-    _tabController.animateTo(index);
-  }
-
   @override
   void dispose() {
+    if (_streamSubscription != null) _streamSubscription.cancel();
     super.dispose();
   }
 }

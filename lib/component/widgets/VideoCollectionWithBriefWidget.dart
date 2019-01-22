@@ -12,6 +12,7 @@ class VideoCollectionWithBriefWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return new Container(
       decoration: ActionViewUtils.renderBorderBottom(),
+      margin: EdgeInsets.only(bottom: 10),
       child: new Column(
         children: <Widget>[
           new Padding(

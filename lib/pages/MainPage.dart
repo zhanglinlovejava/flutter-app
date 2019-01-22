@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import '../component/IconTap.dart';
 import 'package:flutter_open/pages/HomePage.dart';
-import 'NotificationPage.dart';
-import 'package:flutter_open/pages/CommunityPage.dart';
 import './MinePage.dart';
 import '../entity/TabList.dart';
 import 'package:flutter_open/component/BaseAliveState.dart';
-import '../pages/RankListPage.dart';
+import '../pages/CommonTabListPage.dart';
 import '../api/API.dart';
+import '../utils/ActionViewUtils.dart';
+import '../event/EventUtils.dart';
+import 'dart:async';
+import '../event/Events.dart';
+
 const int INDEX_HOME = 0;
 const int INDEX_COMMUNITY = 1;
 const int INDEX_NOTIFICATION = 2;
@@ -15,8 +18,9 @@ const int INDEX_MY = 3;
 
 class MainPage extends StatefulWidget {
   final TabList homeTabList;
+  final TabList communityTabList;
 
-  MainPage(this.homeTabList);
+  MainPage(this.homeTabList, this.communityTabList);
 
   @override
   _MainPageState createState() => _MainPageState();
@@ -29,8 +33,9 @@ class _MainPageState extends BaseAliveSate<MainPage>
   VoidCallback onChange;
   int _currentIndex = 0;
   var titles = <String>['首页', '社区', '通知', '我的'];
+  StreamSubscription<UpdateMainTabEvent> _streamSubscription;
 
-  initState(){
+  initState() {
     super.initState();
     controller = new TabController(length: 4, vsync: this);
     onChange = () {
@@ -39,6 +44,10 @@ class _MainPageState extends BaseAliveSate<MainPage>
       });
     };
     controller.addListener(onChange);
+    _streamSubscription =
+        EventUtils.on<UpdateMainTabEvent>((UpdateMainTabEvent event) {
+      if (_currentIndex != 0) controller.animateTo(0);
+    });
   }
 
   @override
@@ -46,9 +55,14 @@ class _MainPageState extends BaseAliveSate<MainPage>
     return Scaffold(
       body: new TabBarView(
         children: <Widget>[
-          new HomePage(widget.homeTabList),
-          new CommunityPage(),
-          new RankListPage(API.MESSAGE_TAB,title: 'notification',type: 'message'),
+          new HomePage(
+            widget.homeTabList,
+            type: 'home',
+            index: 1,
+          ),
+          new HomePage(widget.communityTabList, type: 'cpmmunity'),
+          new CommonTabListPage(API.MESSAGE_TAB,
+              title: 'notification', type: 'message'),
           new MinePage()
         ],
         controller: controller,
@@ -95,5 +109,11 @@ class _MainPageState extends BaseAliveSate<MainPage>
             ]),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _streamSubscription.cancel();
+    super.dispose();
   }
 }
