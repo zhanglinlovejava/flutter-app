@@ -2,6 +2,7 @@
  高仿开眼app 5.0 版本，
 
  使用的开源库：
+ 
 [dio: ^1.0.9](https://pub.dartlang.org/packages/dio)，
 
 [video_player: ^0.8.0](https://pub.dartlang.org/packages/video_player)，
@@ -10,7 +11,7 @@
 
 [path_provider: ^0.4.0](https://pub.dartlang.org/packages/path_provider)，
 
-[flutter_webview_plugin: ^0.3.0+2](http://www.cnblogs.com/sxdcgaq8080/p/7894828.html)，
+[flutter_webview_plugin: ^0.3.0+2](https://pub.dartlang.org/packages/flutter_webview_plugin)，
 
 [event_bus: ^1.0.1](https://pub.dartlang.org/packages/event_bus)
 
