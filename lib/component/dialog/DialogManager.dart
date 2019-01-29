@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../Constants.dart';
-import 'ActionViewUtils.dart';
+import '../../Constants.dart';
+import '../../utils/ActionViewUtils.dart';
 
 class DialogManger {
   static List<String> _shareActions = [

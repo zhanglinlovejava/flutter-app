@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_open/utils/ActionViewUtils.dart';
+import '../../Constants.dart';
 
 class BriefCardWidget extends StatelessWidget {
   final String icon;
@@ -7,7 +7,6 @@ class BriefCardWidget extends StatelessWidget {
   final String desc;
   final VoidCallback onTap;
   final double titleFontSize;
-
 
   BriefCardWidget(
       {@required this.icon,
@@ -52,7 +51,9 @@ class BriefCardWidget extends StatelessWidget {
                   style: TextStyle(
                       fontSize: titleFontSize,
                       color: Colors.white,
-                      fontFamily: 'FZLanTing'),
+                      fontFamily: ConsFonts.fzFont,
+                      fontWeight: FontWeight.normal,
+                      decoration: TextDecoration.none),
                 ),
                 desc == '' || desc == null
                     ? Container()

@@ -11,6 +11,7 @@ import 'package:flutter_open/component/widgets/button/FavouriteBtnWidget.dart';
 import 'button/ShareBtnWidget.dart';
 import '../../db/DBManager.dart';
 import '../../entity/CollectionEntity.dart';
+import '../../pages/CommonListPage.dart';
 
 class AutoPlayFollowCardWidget extends StatefulWidget {
   final data;
@@ -195,6 +196,7 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
             children: <Widget>[
               GestureDetector(
                 onTap: () {
+                  _showCommentDialog(context,marginTop: 200);
                 },
                 child: Image(
                   image: AssetImage('asset/images/comment_grey.png'),
@@ -239,6 +241,66 @@ class _AutoPlayFollowCardWidgetState extends State<AutoPlayFollowCardWidget> {
         ],
       ),
     );
+  }
+
+  _showCommentDialog(BuildContext context,{double marginTop = 120}) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+              color: Colors.transparent,
+              padding: EdgeInsets.only(top: marginTop),
+              child: Container(
+                color: Color.fromRGBO(0, 0, 0, 0.5),
+                child: Column(
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: (){
+                        print('显示输入框');
+                      },
+                      child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Row(
+                            children: <Widget>[
+                              ClipOval(
+                                child: Image.network(
+                                  'http://img.kaiyanapp.com/63006ecab0eebd80d61a3dceacc5749c.jpeg',
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                    padding: EdgeInsets.only(left: 10),
+                                    child: Text('发表你的评论...',
+                                        style: TextStyle(
+                                            color: Colors.white70,
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 14,
+                                            decoration: TextDecoration.none))),
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  Icons.clear,
+                                  size: 25,
+                                  color: Colors.white70,
+                                ),
+                              )
+                            ],
+                          )),
+                    ),
+                    Expanded(
+                      child:
+                          CommonListPage(API.CATEGORY_ALL, userLoadMore: false),
+                    )
+                  ],
+                ),
+              ));
+        });
   }
 
   _renderAuthorInfo() {

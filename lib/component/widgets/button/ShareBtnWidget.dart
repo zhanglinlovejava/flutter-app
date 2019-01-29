@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../Constants.dart';
-import 'package:flutter_open/utils/DialogManager.dart';
+import 'package:flutter_open/component/dialog/DialogManager.dart';
 import '../../../pages/CollectionPage.dart';
 
 class ShareBtnWidget extends StatefulWidget {

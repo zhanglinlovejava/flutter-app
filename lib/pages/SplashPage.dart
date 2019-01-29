@@ -44,7 +44,7 @@ class _SplashPageState extends State<SplashPage> {
   _fetchCommunityTabList() async {
     await HttpController.getInstance().get(API.COMMUNITY_TAB, (data) {
       _communityTabList = TabList.map(data['tabInfo']['tabList']);
-    }, token: 'SplashHomeTab');
+    }, token: 'SplashCommunityTab');
   }
   _timerToMain() {
    _timer =  new Timer(Duration(seconds: 2), () {
