@@ -15,6 +15,7 @@
 [event_bus: ^1.0.1](https://pub.dartlang.org/packages/event_bus)
 
  目前基本还原了开眼app 的 90% 的功能和界面，以后也会不断的进行完善，喜欢的 star 或者 fork 哦~。
+ 
    <img src="https://github.com/zhanglinlovejava/flutter-app/blob/master/images/S90129-110059.jpg" width="120" height="190" /> <img src="https://github.com/zhanglinlovejava/flutter-app/blob/master/images/S90129-110111.jpg" width="120" height="190" />
          <img src="https://github.com/zhanglinlovejava/flutter-app/blob/master/images/S90129-110124.jpg" width="120" height="190" />
             <img src="https://github.com/zhanglinlovejava/flutter-app/blob/master/images/S90129-110136.jpg" width="120" height="190" />
